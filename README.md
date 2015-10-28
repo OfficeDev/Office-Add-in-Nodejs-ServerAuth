@@ -36,3 +36,14 @@
 
 5. User enters credentials into `APUP`
 6. User grants consent via `APUP`
+7. `OAP` redirects to `redirect_uri` on `AIS` w/ authorization code
+    `https://localhost:3000/OAuth/AuthCode/<SESSID>/<SOCKETID>?code=<CODE>`
+8. `AIS` uses authorization code to negotiate access & refresh w/ `OAP` via AJAJ<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;Once done, `AIS` has the following:<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- client_id (always)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- client_secret (always)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- authorization code (acquired by step #7)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- access_token (just now)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- refresh_token (just now)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- id_token (just now)<br/>
+9. hello
