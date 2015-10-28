@@ -1,5 +1,5 @@
 # Legend
-|*What*|*Symbol*|
+|What|Symbol|
 |---|---|
 |Add-In Pane|`AIP`|
 |Add-In Server|`AIS`|
