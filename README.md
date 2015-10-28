@@ -30,9 +30,9 @@
              &response_type=code
              &redirect_uri=https://localhost:3000/OAuth/AuthCode/<SESSID>/<SOCKETID>
              */
-    });
-}
-```
+        });
+    }
+    ```
 
 5. `APUP` - User enters credentials
 6. `APUP` - User grants consent (if necessary)
