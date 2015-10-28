@@ -34,3 +34,5 @@ function signIn() {
 }
 ```
 
+5. `APUP` - User enters credentials
+6. `APUP` - User grants consent (if necessary)
