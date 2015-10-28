@@ -5,7 +5,7 @@
 |Add-In Server|`AIS`|
 |Arbitrary OAuth 2.0 Provider|`OAP`|
 |Auth Pop-Up|`APUP`|
-|Persistent session id (`AIP` / `AIS`)|`SESSID`|
+|Persistent session id (between `AIP` / `AIS`)|`SESSID`|
 
 # First run flow
 
