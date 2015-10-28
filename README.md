@@ -7,7 +7,6 @@
 |Auth Pop-Up|`APUP`|
 |Persistent session id (`AIP` / `AIS`)|`SESSID`|
 
-
 # First run flow
 
 1. `AIP` does `GET /` to `AIS`
@@ -46,4 +45,10 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- `access_token` (just now)<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- `refresh_token` (just now)<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- `id_token` (just now)<br/>
-9. hello
+9. `AIS` creates a new record for the authenticated user
+
+    |SESSID|access_token|access_token_expiration|refresh_token|refresh_token_expiration
+    |---|---|---|---|---|
+    |GUID|GUID|DateTime|GUID| DateTime|
+
+10. `AIS` 'calls back' to `AIP` via websocket to inform 'ready' state
