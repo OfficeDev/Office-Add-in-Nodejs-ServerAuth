@@ -48,7 +48,7 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- `id_token` (just now)<br/>
 10. `AIS` creates a new record for the authenticated user
 
-    |SESSID|access_token|access_token_expiration|refresh_token|refresh_token_expiration
+    |`SESSID`|`access_token`|`access_token_expiry`|`refresh_token`|`refresh_token_expiry`
     |---|---|---|---|---|
     |GUID|GUID|DateTime|GUID| DateTime|
 
