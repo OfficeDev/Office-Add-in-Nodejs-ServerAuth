@@ -15,21 +15,21 @@
 3. `AIS` serves `AIP` with `/` and `Set-Cookie: <SESSID>`
 4. User clicks `signIn()` in `AIP`
 
-```javascript
-function signIn() {
-    // open a socket connection AIS
-    openSocket('https://localhost.com:3001/', function(connection){
-        var socketId = connection.socketId;
-        // open a pop-up for auth
-        window.open('/connect/azure/' + document.cookie + '/' + socketId);
+    ```javascript
+    function signIn() {
+        // open a socket connection AIS
+        openSocket('https://localhost.com:3001/', function(connection){
+            var socketId = connection.socketId;
+            // open a pop-up for auth
+            window.open('/connect/azure/' + document.cookie + '/' + socketId);
         
-        /* AIS will parse & redirect this request so the url looks something like:
-         https://login.microsoftonline.com/common/oauth2/authorize?
-         client_id= + CLIENT_ID
-         &resource=https://graph.microsoft.com/
-         &response_type=code
-         &redirect_uri=https://localhost:3000/OAuth/AuthCode/<SESSID>/<SOCKETID>
-         */
+            /* AIS will parse & redirect this request so the url looks something like:
+             https://login.microsoftonline.com/common/oauth2/authorize?
+             client_id= + CLIENT_ID
+             &resource=https://graph.microsoft.com/
+             &response_type=code
+             &redirect_uri=https://localhost:3000/OAuth/AuthCode/<SESSID>/<SOCKETID>
+             */
     });
 }
 ```
