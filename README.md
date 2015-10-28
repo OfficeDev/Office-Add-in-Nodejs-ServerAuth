@@ -51,4 +51,4 @@
     |---|---|---|---|---|
     |GUID|GUID|DateTime|GUID| DateTime|
 
-10. `AIS` 'calls back' to `AIP` via websocket to inform 'ready' state
+10. `AIS` 'calls back' to `AIP` via websocket to inform 'ready' state (redraw, reload, do whatever)
