@@ -34,5 +34,5 @@
     }
     ```
 
-5. `APUP` - User enters credentials
-6. `APUP` - User grants consent (if necessary)
+5. User enters credentials into `APUP`
+6. User grants consent via `APUP`
