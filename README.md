@@ -10,7 +10,7 @@
 # First run flow
 
 1. `AIP` does `GET /` to `AIS` over HTTPS
-2. `AIS` generates persistent session id, we'll call this `SESSID`
+2. `AIS` generates [**persistent**](https://en.wikipedia.org/wiki/HTTP_cookie#Persistent_cookie) session id, we'll call this `SESSID`
 3. `AIS` serves `AIP` with `/` and `Set-Cookie: <SESSID>`
 4. User clicks `signIn()` in `AIP`
 
