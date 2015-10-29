@@ -20,7 +20,7 @@
         openSocket('https://localhost.com:3001/', function(connection){
             var socketId = connection.socketId;
             // open a pop-up for auth
-            window.open('/connect/azure/' + document.cookie + '/' + socketId);
+            window.open('/connect/azure/' + document.cookie + '/' + socketId, 'APUP', 'width=500,height=500');
         
             /* AIS will parse & redirect this request so the url looks something like:
              https://login.microsoftonline.com/common/oauth2/authorize?
@@ -50,7 +50,7 @@
 
     |`SESSID`|`access_token`|`access_token_expiry`|`refresh_token`|`refresh_token_expiry`
     |---|---|---|---|---|
-    |GUID|GUID|DateTime|GUID| DateTime|
+    |GUID|String|LongOrSpan|String|LongOrSpan|
 
 11. `AIS` 'calls back' to `AIP` via websocket (#4) to inform 'ready' state (redraw, reload, do whatever)
 12. (...eventually) `AIP` makes request to `AIS`, credentials are rehydrated from datastore, request is proxied, returns result over HTTPS
