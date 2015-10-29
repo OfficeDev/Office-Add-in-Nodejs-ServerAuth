@@ -20,7 +20,7 @@
         openSocket('https://localhost.com:3001/', function(connection){
             var socketId = connection.socketId;
             // open a pop-up for auth
-            window.open('/connect/azure/' + document.cookie + '/' + socketId);
+            window.open('/connect/azure/' + document.cookie + '/' + socketId, 'APUP', 'width=500,height=500');
         
             /* AIS will parse & redirect this request so the url looks something like:
              https://login.microsoftonline.com/common/oauth2/authorize?
