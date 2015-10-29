@@ -50,7 +50,7 @@
 
     |`SESSID`|`access_token`|`access_token_expiry`|`refresh_token`|`refresh_token_expiry`
     |---|---|---|---|---|
-    |GUID|GUID|DateTime|GUID| DateTime|
+    |GUID|String|LongOrSpan|String|LongOrSpan|
 
 11. `AIS` 'calls back' to `AIP` via websocket (#4) to inform 'ready' state (redraw, reload, do whatever)
 12. (...eventually) `AIP` makes request to `AIS`, credentials are rehydrated from datastore, request is proxied, returns result over HTTPS
