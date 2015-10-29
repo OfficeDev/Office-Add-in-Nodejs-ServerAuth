@@ -1,12 +1,25 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var express = require('express')
+  , path = require('path')
+  , favicon = require('serve-favicon')
+  , logger = require('morgan')
+  , cookieParser = require('cookie-parser')
+  , bodyParser = require('body-parser')
+  , passport = require('passport')
+  , OAuth2Strategy = require('passport-oauth').OAuth2Strategy
+  , azureConfig = require('./ws-conf').azureConf;
+
+// teach passport how to use azure
+passport.use('azure', new OAuth2Strategy(azureConfig,
+  function (accessToken, refreshToken, profile, done) {
+    // TODO why is this *never* called?
+    console.log("verify");
+    console.log("Access token: " + accessToken);
+    console.log("Refresh token: " + refreshToken);
+    done(null, profile);
+  }));
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var connect = require('./routes/connect');
 
 var app = express();
 
@@ -23,10 +36,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/connect', connect);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -37,7 +50,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -48,7 +61,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
