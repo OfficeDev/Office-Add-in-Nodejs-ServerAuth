@@ -7,7 +7,7 @@ router.get('/azure', passport.authenticate('azure'));
 router.get('/:service/callback', function (req, res) {
   var service = req.params.service;
   var code = req.query.code;
-  res.send('Service: [' + service + '] authenticated with code: [' + code + ']')
+  res.render('auth_complete');
 });
 
 module.exports = router;
