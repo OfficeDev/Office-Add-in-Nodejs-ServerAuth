@@ -5,6 +5,7 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , passport = require('passport')
+  , session = require('express-session')
   , OAuth2Strategy = require('passport-oauth').OAuth2Strategy
   , azureConfig = require('./ws-conf').azureConf;
 
@@ -12,7 +13,6 @@ var express = require('express')
 passport.use('azure', new OAuth2Strategy(azureConfig,
   function (accessToken, refreshToken, profile, done) {
     // TODO why is this *never* called?
-    console.log("verify");
     console.log("Access token: " + accessToken);
     console.log("Refresh token: " + refreshToken);
     done(null, profile);
@@ -33,10 +33,32 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  name: 'nodecookie',
+  cookie: {
+    path: '/',
+    httpOnly: false,
+    secure: false,
+    maxAge: null
+  },
+  saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/connect', connect);
+
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
