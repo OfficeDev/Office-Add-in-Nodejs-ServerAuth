@@ -13,6 +13,7 @@
     "express-session": "^1.12.1",
     "jade": "~1.11.0",
     "morgan": "~1.6.1",
+    "nano": "^6.1.5",
     "passport": "^0.3.0",
     "passport-azure-ad-oauth2": "0.0.4",
     "serve-favicon": "~2.3.0",
