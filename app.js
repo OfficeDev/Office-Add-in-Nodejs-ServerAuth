@@ -6,11 +6,11 @@ var express = require('express')
   , bodyParser = require('body-parser')
   , passport = require('passport')
   , session = require('express-session')
-  , OAuth2Strategy = require('passport-oauth').OAuth2Strategy
+  , AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
   , azureConfig = require('./ws-conf').azureConf;
 
 // teach passport how to use azure
-passport.use('azure', new OAuth2Strategy(azureConfig,
+passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (accessToken, refreshToken, profile, done) {
     // TODO why is this *never* called?
     console.log("Access token: " + accessToken);
