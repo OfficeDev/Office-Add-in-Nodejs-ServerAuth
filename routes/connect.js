@@ -6,8 +6,8 @@ router.get('/azure', passport.authenticate('azure'));
 
 router.get('/azure/callback',
   passport.authenticate('azure', {
-    successRedirect: '/',
-    failureRedirect: '/login'
+    successRedirect: '/close',
+    failureRedirect: '/error'
   }));
 
 module.exports = router;
