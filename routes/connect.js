@@ -1,6 +1,12 @@
 var express = require('express')
   , router = express.Router()
-  , passport = require('passport');
+  , passport = require('passport')
+  , io = require('../app');
+
+io.on('connection', function (socket) {
+  console.log('Socket connection est');
+  socket.emit('init', "connection est")
+});
 
 router.get('/azure', passport.authenticate('azure'));
 

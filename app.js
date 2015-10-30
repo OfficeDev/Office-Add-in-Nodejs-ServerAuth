@@ -1,5 +1,16 @@
 var express = require('express')
-  , path = require('path')
+  , app = express()
+// load up the certificates
+  , certConf = require('./certconf')
+// create the socket server
+  , socketServer = require('https').createServer(certConf, app)
+// bind it to socket.io
+  , io = require('socket.io')(socketServer);
+
+socketServer.listen(3001);
+module.exports = io;
+
+var path = require('path')
   , favicon = require('serve-favicon')
   , logger = require('morgan')
   , cookieParser = require('cookie-parser')
@@ -7,7 +18,9 @@ var express = require('express')
   , passport = require('passport')
   , session = require('express-session')
   , AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
-  , azureConfig = require('./ws-conf').azureConf;
+  , azureConfig = require('./ws-conf').azureConf
+  , routes = require('./routes/index')
+  , connect = require('./routes/connect');
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
@@ -17,11 +30,6 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
     console.log("Refresh token: " + refreshToken);
     done(null, profile);
   }));
-
-var routes = require('./routes/index');
-var connect = require('./routes/connect');
-
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
