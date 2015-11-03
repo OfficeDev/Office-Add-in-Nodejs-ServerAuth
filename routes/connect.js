@@ -20,6 +20,7 @@ router.get('/close', function (req, res) {
   res.render('auth_complete');
   console.log("Successfully authenticated user:\n" + JSON.stringify(req.user));
   // transmit this data back over the socket?
+  console.log("session id: " + req.sessionID);
 });
 
 router.get('/error', function (req, res) {
