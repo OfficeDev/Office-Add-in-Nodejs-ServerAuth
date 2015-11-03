@@ -20,14 +20,25 @@ var path = require('path')
   , AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
   , azureConfig = require('./ws-conf').azureConf
   , routes = require('./routes/index')
-  , connect = require('./routes/connect');
+  , connect = require('./routes/connect')
+  , DbHelper = require('./db-helper');
+
+var dbHelperInstance = new DbHelper();
+dbHelperInstance.insertDoc({ testField: "testValue" },
+  function (err, body) {
+    dbHelperInstance.destroy(function () {
+      console.log("Database deleted");
+    });
+  });
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
-  function (accessToken, refreshToken, profile, done) {
+  function (accessToken, refreshToken, params, profile, done) {
     // TODO why is this *never* called?
     console.log("Access token: " + accessToken);
     console.log("Refresh token: " + refreshToken);
+    console.log("Id token: " + params.id_token);
+    console.log('Profile: ' + JSON.stringify(profile));
     done(null, profile);
   }));
 
@@ -61,10 +72,14 @@ app.use('/', routes);
 app.use('/connect', connect);
 
 passport.serializeUser(function (user, done) {
+  console.log('serializeUser()');
+  console.log("user:\n" + JSON.stringify(user));
   done(null, user);
 });
 
 passport.deserializeUser(function (user, done) {
+  console.log('deserializeUser()');
+  console.log(user);
   done(null, user);
 });
 
