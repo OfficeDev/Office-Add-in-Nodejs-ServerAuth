@@ -33,10 +33,10 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
     var userSession = {
       accessToken: accessToken,
       refreshToken: refreshToken,
-      family_name: aadProfile.family_name,
-      given_name: aadProfile.given_name,
+      familyName: aadProfile.family_name,
+      givenName: aadProfile.given_name,
       name: aadProfile.name,
-      unique_name: aadProfile.unique_name,
+      uniqueName: aadProfile.unique_name,
       ver: aadProfile.ver
     }
     
@@ -51,9 +51,6 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
           // include the db id in the user session for lookup?
           userSession.id = body.id;
         }
-        dbHelperInstance.destroy(function () {
-          console.log("Database deleted");
-        });
         done(null, userSession);
       });
   }));
