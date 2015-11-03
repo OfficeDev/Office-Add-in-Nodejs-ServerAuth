@@ -11,7 +11,7 @@
 
 1. `AIP` does `GET /` to `AIS` over HTTPS
 2. `AIS` generates [**persistent**](https://en.wikipedia.org/wiki/HTTP_cookie#Persistent_cookie) session id, we'll call this `SESSID`
-3. `AIS` serves `AIP` with `/` and `Set-Cookie: <SESSID>`
+3. `AIS` serves `AIP` with `/` and `Set-Cookie: <SESSID>` - (using [cookie-parser](https://www.npmjs.com/package/cookie-parser) to gen/validate signed cookies)
 4. User clicks `signIn()` in `AIP`
 
     ```javascript
@@ -46,11 +46,21 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- `access_token` (just now)<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- `refresh_token` (just now)<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- `id_token` (just now)<br/>
-10. `AIS` creates a new record for the authenticated user
-
-    |`SESSID`|`access_token`|`access_token_expiry`|`refresh_token`|`refresh_token_expiry`
-    |---|---|---|---|---|
-    |GUID|String|LongOrSpan|String|LongOrSpan|
+10. `AIS` creates a new record for the authenticated user - schema TBD but something like....
+    ```json
+    {
+      "accessToken": "AADF736LKLJD235FWEADFA/",
+      "accessTokenExpiry": "1446586191633",
+      "refreshTokenExpiry": "1446586191633",
+      "refreshToken": "ASDLKFA23LDFMADSFDAECE=",
+      "familyName": "Darrow",
+      "givenName": "Alex",
+      "name": "AlexDarrow",
+      "uniqueName": "AlexD@patsoldemo6.onmicrosoft.com",
+      "ver": "1.0",
+      "id": "c74f27c85927c26207650cab4b0734b5"
+}
+    ```
 
 11. `AIS` 'calls back' to `AIP` via websocket (#4) to inform 'ready' state (redraw, reload, do whatever)
 12. (...eventually) `AIP` makes request to `AIS`, credentials are rehydrated from datastore, request is proxied, returns result over HTTPS
