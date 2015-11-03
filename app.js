@@ -21,7 +21,8 @@ var path = require('path')
   , azureConfig = require('./ws-conf').azureConf
   , routes = require('./routes/index')
   , connect = require('./routes/connect')
-  , DbHelper = require('./db-helper');
+  , DbHelper = require('./db-helper')
+  , jwt = require('jsonwebtoken');
 
 var dbHelperInstance = new DbHelper();
 dbHelperInstance.insertDoc({ testField: "testValue" },
@@ -34,11 +35,34 @@ dbHelperInstance.insertDoc({ testField: "testValue" },
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (accessToken, refreshToken, params, profile, done) {
-    // TODO why is this *never* called?
     console.log("Access token: " + accessToken);
     console.log("Refresh token: " + refreshToken);
-    console.log("Id token: " + params.id_token);
-    console.log('Profile: ' + JSON.stringify(profile));
+
+    var webToken = jwt.decode(params.id_token);
+    console.log("\n\nBegin decoded token:\n")
+    console.log("Id token: " + JSON.stringify(webToken) + "\n");
+
+    // Sample of what this data looks like:
+    // {
+    //   "aud": "656bfacf-5d64-418d-97dd-963e72d413de",
+    //   "iss": "https://sts.windows.net/ed46058a-1957-405e-8d5a-fae110f41cb8/",
+    //   "iat": 1446521223,
+    //   "nbf": 1446521223,
+    //   "exp": 1446525123,
+    //   "amr": [
+    //     "pwd"
+    //   ],
+    //   "family_name": "Darrow",
+    //   "given_name": "Alex",
+    //   "name": "Alex Darrow",
+    //   "oid": "78613dcd-07f3-46e1-88aa-f8e283322b9d",
+    //   "sub": "qdgP8Jwm6t1HrLdGO8rRrp9Ngs72Qpckrt0KZr3OydE",
+    //   "tid": "ed46058a-1957-405e-8d5a-fae110f41cb8",
+    //   "unique_name": "AlexD@patsoldemo6.onmicrosoft.com",
+    //   "upn": "AlexD@patsoldemo6.onmicrosoft.com",
+    //   "ver": "1.0"
+    // }
+
     done(null, profile);
   }));
 
