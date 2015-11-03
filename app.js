@@ -22,48 +22,40 @@ var path = require('path')
   , routes = require('./routes/index')
   , connect = require('./routes/connect')
   , DbHelper = require('./db-helper')
+  , dbHelperInstance = new DbHelper()
   , jwt = require('jsonwebtoken');
-
-var dbHelperInstance = new DbHelper();
-dbHelperInstance.insertDoc({ testField: "testValue" },
-  function (err, body) {
-    dbHelperInstance.destroy(function () {
-      console.log("Database deleted");
-    });
-  });
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (accessToken, refreshToken, params, profile, done) {
-    console.log("Access token: " + accessToken);
-    console.log("Refresh token: " + refreshToken);
+    var aadProfile = jwt.decode(params.id_token);
 
-    var webToken = jwt.decode(params.id_token);
-    console.log("\n\nBegin decoded token:\n")
-    console.log("Id token: " + JSON.stringify(webToken) + "\n");
-
-    // Sample of what this data looks like:
-    // {
-    //   "aud": "656bfacf-5d64-418d-97dd-963e72d413de",
-    //   "iss": "https://sts.windows.net/ed46058a-1957-405e-8d5a-fae110f41cb8/",
-    //   "iat": 1446521223,
-    //   "nbf": 1446521223,
-    //   "exp": 1446525123,
-    //   "amr": [
-    //     "pwd"
-    //   ],
-    //   "family_name": "Darrow",
-    //   "given_name": "Alex",
-    //   "name": "Alex Darrow",
-    //   "oid": "78613dcd-07f3-46e1-88aa-f8e283322b9d",
-    //   "sub": "qdgP8Jwm6t1HrLdGO8rRrp9Ngs72Qpckrt0KZr3OydE",
-    //   "tid": "ed46058a-1957-405e-8d5a-fae110f41cb8",
-    //   "unique_name": "AlexD@patsoldemo6.onmicrosoft.com",
-    //   "upn": "AlexD@patsoldemo6.onmicrosoft.com",
-    //   "ver": "1.0"
-    // }
-
-    done(null, profile);
+    var userSession = {
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      family_name: aadProfile.family_name,
+      given_name: aadProfile.given_name,
+      name: aadProfile.name,
+      unique_name: aadProfile.unique_name,
+      ver: aadProfile.ver
+    }
+    
+    // TODO persist this object - just testing for now...
+    // So I reckon what happens is that I can insert a record and
+    // then put that object on the user session so I can rehydrate
+    // that user later
+    dbHelperInstance.insertDoc(userSession,
+      function (err, body) {
+        if (!err) {
+          console.log("Inserted [" + userSession.name + "] id: " + body.id);
+          // include the db id in the user session for lookup?
+          userSession.id = body.id;
+        }
+        dbHelperInstance.destroy(function () {
+          console.log("Database deleted");
+        });
+        done(null, userSession);
+      });
   }));
 
 // view engine setup
@@ -96,14 +88,10 @@ app.use('/', routes);
 app.use('/connect', connect);
 
 passport.serializeUser(function (user, done) {
-  console.log('serializeUser()');
-  console.log("user:\n" + JSON.stringify(user));
   done(null, user);
 });
 
 passport.deserializeUser(function (user, done) {
-  console.log('deserializeUser()');
-  console.log(user);
   done(null, user);
 });
 

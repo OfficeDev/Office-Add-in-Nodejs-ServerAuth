@@ -18,6 +18,8 @@ router.get('/azure/callback',
 
 router.get('/close', function (req, res) {
   res.render('auth_complete');
+  console.log("Successfully authenticated user:\n" + JSON.stringify(req.user));
+  // transmit this data back over the socket?
 });
 
 router.get('/error', function (req, res) {
