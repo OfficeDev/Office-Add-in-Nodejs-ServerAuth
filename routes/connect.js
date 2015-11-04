@@ -1,10 +1,23 @@
 var express = require('express')
   , router = express.Router()
   , passport = require('passport')
-  , io = require('../app');
+  , io = require('../app')
+  , cookie = require("cookie")
+  , cookieParser = require('cookie-parser');
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');
+  console.log(socket.handshake.headers.cookie);
+  var jsonCookie =
+    cookie.parse(socket.handshake.headers.cookie);
+  var nodecookie = jsonCookie.nodecookie;
+  var decodedCookie = cookieParser.signedCookie(nodecookie, "keyboard cat");
+  console.log("nodecookie: " + nodecookie);
+  console.log("de-signed cookie: " + decodedCookie);
+  /*
+ Tie this data back to socket session...maybe make a 'room'?
+ http://stackoverflow.com/questions/6913801/sending-message-to-specific-client-with-socket-io-and-empty-message-queue
+ */
   socket.emit('init', "connection est")
 });
 
