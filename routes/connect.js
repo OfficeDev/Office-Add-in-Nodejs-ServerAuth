@@ -7,18 +7,18 @@ var express = require('express')
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');
-  console.log(socket.handshake.headers.cookie);
   var jsonCookie =
-    cookie.parse(socket.handshake.headers.cookie);
-  var nodecookie = jsonCookie.nodecookie;
-  var decodedCookie = cookieParser.signedCookie(nodecookie, "keyboard cat");
-  console.log("nodecookie: " + nodecookie);
-  console.log("de-signed cookie: " + decodedCookie);
-  /*
- Tie this data back to socket session...maybe make a 'room'?
- http://stackoverflow.com/questions/6913801/sending-message-to-specific-client-with-socket-io-and-empty-message-queue
- */
-  socket.emit('init', "connection est")
+    cookie.parse(socket
+      .handshake
+      .headers
+      .cookie);
+  var decodedNodeCookie =
+    cookieParser
+      .signedCookie(jsonCookie.nodecookie, "keyboard cat");
+  console.log("de-signed cookie: " + decodedNodeCookie);
+  // the sessionId becomes the room name for this session
+  socket.join(decodedNodeCookie);
+  io.to(decodedNodeCookie).emit('init', "Private socket session established");
 });
 
 router.get('/azure', passport.authenticate('azure'));
