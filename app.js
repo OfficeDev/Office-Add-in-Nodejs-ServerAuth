@@ -30,9 +30,14 @@ var path = require('path')
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (accessToken, refreshToken, params, profile, done) {
     var aadProfile = jwt.decode(params.id_token);
-
+    
+    // Extract the access token expiration date as a unix timestamp
+    var accessTokenExpiry = 
+      jwt.decode(accessToken, {complete: true}).payload.exp;
+    
     var userData = {
       accessToken: accessToken,
+      accessTokenExpiry: accessTokenExpiry,
       refreshToken: refreshToken,
       familyName: aadProfile.family_name,
       givenName: aadProfile.given_name,
