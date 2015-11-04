@@ -51,7 +51,6 @@
     {
       "accessToken": "AADF736LKLJD235FWEADFA/",
       "accessTokenExpiry": "1446586191633",
-      "refreshTokenExpiry": "1446586191633",
       "refreshToken": "ASDLKFA23LDFMADSFDAECE=",
       "familyName": "Darrow",
       "givenName": "Alex",
