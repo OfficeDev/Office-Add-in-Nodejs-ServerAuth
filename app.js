@@ -31,10 +31,11 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (accessToken, refreshToken, params, profile, done) {
     var aadProfile = jwt.decode(params.id_token);
     
-    // Extract the access token expiration date as a unix timestamp
-    var accessTokenExpiry = 
-      jwt.decode(accessToken, {complete: true}).payload.exp;
-    
+    // Extract the access token expiration date as a unix
+    // (millis) timestamp
+    var accessTokenExpiry =
+      jwt.decode(accessToken, { complete: true }).payload.exp;
+
     var userData = {
       accessToken: accessToken,
       accessTokenExpiry: accessTokenExpiry,
@@ -91,11 +92,14 @@ app.use('/', routes);
 app.use('/connect', connect);
 
 passport.serializeUser(function (user, done) {
-  done(null, user);
+  // keep those sessions light!
+  done(null, user.id);
 });
 
-passport.deserializeUser(function (user, done) {
-  done(null, user);
+passport.deserializeUser(function (userId, done) {
+  dbHelperInstance.getUser(userId, function (err, user) {
+    done(null, user);
+  });
 });
 
 // catch 404 and forward to error handler

@@ -12,6 +12,12 @@ DbHelper.prototype.destroy = function destroy(callback) {
 	nano.db.destroy(dbName, callback);
 };
 
+DbHelper.prototype.getUser = function getUser(userId, callback) {
+	db.get(userId, function (err, body) {
+		callback(err, body);
+	});
+};
+
 // internal
 function _insertDoc(doc, tried, callback) {
 	db.insert(doc,
