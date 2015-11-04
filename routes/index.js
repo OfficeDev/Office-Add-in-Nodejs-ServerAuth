@@ -5,7 +5,6 @@ var router = express.Router();
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
   console.log("Requestor: [" + req.sessionID + "]");
-  console.log("Cookies: " + req.cookies);
 });
 
 module.exports = router;
