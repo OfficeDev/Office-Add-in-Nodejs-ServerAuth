@@ -23,7 +23,8 @@ var path = require('path')
   , connect = require('./routes/connect')
   , DbHelper = require('./db-helper')
   , dbHelperInstance = new DbHelper()
-  , jwt = require('jsonwebtoken');
+  , jwt = require('jsonwebtoken')
+  , ONE_DAY_MILLIS = 86400000;
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
@@ -73,7 +74,7 @@ app.use(session({
     path: '/',
     httpOnly: false,
     secure: false,
-    maxAge: null
+    maxAge: 7 * ONE_DAY_MILLIS
   },
   saveUninitialized: true
 }));
