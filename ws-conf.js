@@ -4,5 +4,6 @@ exports.azureConf = {
     clientID: '656bfacf-5d64-418d-97dd-963e72d413de',
     clientSecret: 'OXr1ELYueLaVGTFmfsZjoUO37pCYNSqKTG0iOnJXcDA=',
     resource: 'https://graph.microsoft.com',
-    callbackURL: 'https://localhost:3000/connect/azure/callback'
+    callbackURL: 'https://localhost:3000/connect/azure/callback',
+    passReqToCallback: true
 };

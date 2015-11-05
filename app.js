@@ -21,14 +21,13 @@ var path = require('path')
   , azureConfig = require('./ws-conf').azureConf
   , routes = require('./routes/index')
   , connect = require('./routes/connect')
-  , DbHelper = require('./db-helper')
-  , dbHelperInstance = new DbHelper()
+  , dbHelperInstance = new (require('./db-helper'))()
   , jwt = require('jsonwebtoken')
   , ONE_DAY_MILLIS = 86400000;
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
-  function (accessToken, refreshToken, params, profile, done) {
+  function (req, accessToken, refreshToken, params, profile, done) {
     var aadProfile = jwt.decode(params.id_token);
     
     // Extract the access token expiration date as a unix
@@ -36,8 +35,17 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
     var accessTokenExpiry =
       jwt.decode(accessToken, { complete: true }).payload.exp;
 
-    var userData = {
+    var userData = {};
+    userData.sessid = req.sessionID;
+    // FIXME
+    // this will have to change when there are more providers
+    if (!userData.providers) {
+      userData.providers = [];
+    }
+
+    userData.providers.push({
       accessToken: accessToken,
+      providerName: 'azure',
       accessTokenExpiry: accessTokenExpiry,
       refreshToken: refreshToken,
       familyName: aadProfile.family_name,
@@ -45,16 +53,16 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
       name: aadProfile.name,
       uniqueName: aadProfile.unique_name,
       ver: aadProfile.ver
-    }
+    });
     
     // TODO persist this object - just testing for now...
     // So I reckon what happens is that I can insert a record and
     // then put that object on the user session so I can rehydrate
     // that user later
-    dbHelperInstance.insertDoc(userData,
+    dbHelperInstance.insertDoc(userData, null,
       function (err, body) {
         if (!err) {
-          console.log("Inserted [" + userData.name + "] id: " + body.id);
+          console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
           // include the db id in the user session for lookup?
           userData.id = body.id;
         }
@@ -93,11 +101,12 @@ app.use('/connect', connect);
 
 passport.serializeUser(function (user, done) {
   // keep those sessions light!
-  done(null, user.id);
+  done(null, user.sessid);
 });
 
-passport.deserializeUser(function (userId, done) {
-  dbHelperInstance.getUser(userId, function (err, user) {
+passport.deserializeUser(function (sessid, done) {
+  console.log('here?');
+  dbHelperInstance.getUser(sessid, function (err, user) {
     done(null, user);
   });
 });

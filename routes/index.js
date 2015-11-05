@@ -1,5 +1,6 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+  , router = express.Router()
+  , dbHelper = new (require('../db-helper'))();
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -11,15 +12,21 @@ router.get('/', function (req, res, next) {
   DELETE TOKENS IF THEYRE EXPIRED
   */
   var sid = req.sessionID;
+  var user = req.user;
+  if (user) {
+    console.log(JSON.stringify(user));
+  } else {
+    console.error("No user found");
+  }
   var userState = {
     title: 'Express',
     azure: false,
     google: false
   };
-  if (userHasSessionAssociator(sid)) {
-    if (hasService('azure', sid) && isValid('azure', sid)) {
+  if (user) {
+    if (hasProvider(user, 'azure') && isValid('azure', sid)) {
       userState.azure = true;
-    } else if (hasService('google', sid) && isValid('google', sid)) {
+    } else if (hasProvider(user, 'google') && isValid('google', sid)) {
       userState.google = true;
     }
   }
@@ -27,18 +34,21 @@ router.get('/', function (req, res, next) {
   console.log("Requestor: [" + req.sessionID + "]");
 });
 
+function hasProvider(user, sought) {
+  var hasProvider;
+  if (user.providers) {
+    user.providers.forEach(function (provider) {
+      console.log('name: ' + provider.providerName);
+      if (provider.providerName === sought) {
+        hasProvider = true;
+      }
+    });
+  }
+  return hasProvider;
+}
+
 // TODO method stub
 function isValid(service, sessionID) {
-  return true;
-}
-
-// TODO method stub
-function hasService(service, sessionID) {
-  return false;
-}
-
-// TODO method stub
-function userHasSessionAssociator(sessionID) {
   return true;
 }
 
