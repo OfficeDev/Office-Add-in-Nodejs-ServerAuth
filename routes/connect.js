@@ -14,11 +14,11 @@ io.on('connection', function (socket) {
       .cookie);
   var decodedNodeCookie =
     cookieParser
-      .signedCookie(jsonCookie.nodecookie, "keyboard cat");
-  console.log("de-signed cookie: " + decodedNodeCookie);
+      .signedCookie(jsonCookie.nodecookie, 'keyboard cat');
+  console.log('de-signed cookie: ' + decodedNodeCookie);
   // the sessionId becomes the room name for this session
   socket.join(decodedNodeCookie);
-  io.to(decodedNodeCookie).emit('init', "Private socket session established");
+  io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
 
 router.get('/azure', passport.authenticate('azure'));
@@ -34,6 +34,10 @@ router.get('/close', function (req, res) {
   console.log("Successfully authenticated user:\n" + JSON.stringify(req.user));
   // transmit this data back over the socket?
   console.log("session id: " + req.sessionID);
+  io.to(req.sessionID).emit('auth_success', {
+    provider: 'azure',
+    event: 'authentication complete!'
+  });
 });
 
 router.get('/error', function (req, res) {

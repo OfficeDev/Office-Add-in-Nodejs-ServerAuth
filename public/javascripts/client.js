@@ -7,8 +7,8 @@ socket.on('init', function (data) {
 });
 
 socket.on('auth_success', function (data) {
-	console.log(data.provider + ' token: ' + data.code.substring(0, 10) + "...[truncated]");
-	if (data.provider === 'Azure') {
+	console.log(JSON.stringify(data));
+	if (data.provider === 'azure') {
 		$('#azure_disconnected').css('display', 'none');
 		$('#azure_connected').css('display', 'block');
 	}
