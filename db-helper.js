@@ -13,17 +13,25 @@ DbHelper.prototype.destroy = function destroy(callback) {
 };
 
 DbHelper.prototype.getUser = function getUser(sessid, callback) {
-	db.list({ sessid: sessid }, function (err, body) {
-		if (err) {
-			console.error("Error: " + err);
+	console.log('user session: ' + sessid);
+	// For production instances, use a view
+	// https://wiki.apache.org/couchdb/HTTP_view_API
+
+	// open the view
+	db.view('user-sessions', 'by_sessionID', {
+		keys: [
+			sessid
+		]
+	}, function (err, body) {
+		if (err || !body || !body.rows) {
+			console.log("getUser: " + err);
 			callback(err, body);
 		} else {
-			console.log('Found record: ' + JSON.stringify(body));
-			if (1 === body.total_rows) {
-				var userRecord = body.rows[0].id;
-				db.get(userRecord, function (err, body) {
-					callback(err, body);
-				});
+			console.log("getUser: " + JSON.stringify(body));
+			if (body.rows.length == 1) {
+				callback(err, body.rows[0].value);
+			} else {
+				callback(err, null);
 			}
 		}
 	});
@@ -42,15 +50,24 @@ function _insertDoc(doc, params, tried, callback) {
 					console.log("creating db");
 					return nano.db.create(dbName, function () {
 						console.log("reattempting insert")
-						_insertDoc(doc, params, ++tried, callback);
+						// create the view we will need to lookup users later
+						db.insert({
+							views: {
+								by_sessionID: {
+									map: function (doc) { if (doc.sessid) { emit(doc.sessid, doc); } }
+								}
+							}
+						}, '_design/user-sessions', function (err, body) {
+							_insertDoc(doc, params, ++tried, callback);
+						});
 					});
 				} else {
 					console
-						.error("Giving up - Tries: [" + tried + "] - error:\n" + err);
+						.error('Giving up - Tries: [' + tried + '] - error:\n' + err);
 					callback(err, body);
 				}
 			} else {
-				console.log("Record inserted");
+				console.log('Record inserted');
 				callback(err, body);
 			}
 		});

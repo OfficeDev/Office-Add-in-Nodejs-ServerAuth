@@ -11,6 +11,7 @@ router.get('/', function (req, res, next) {
     google: false
   };
   if (user) {
+    console.log('session found');
     assessUserState(userState, user);
     console.log(JSON.stringify(user));
     res.render('index', userState);
