@@ -17,6 +17,7 @@ router.get('/', function (req, res, next) {
     res.render('index', userState);
     console.log("Requestor: [" + req.sessionID + "]");
   } else {
+    console.log('no sessionfound');
     dbHelper.getUser(req.sessionID, function (err, user) {
       req.user = user;
       assessUserState(userState, user);
