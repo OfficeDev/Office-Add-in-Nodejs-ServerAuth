@@ -16,12 +16,12 @@ DbHelper.prototype.getUser = function getUser(sessid, callback) {
 	db.list({ sessid: sessid }, function (err, body) {
 		if (err) {
 			console.error("Error: " + err);
+			callback(err, body);
 		} else {
 			console.log('Found record: ' + JSON.stringify(body));
 			if (1 === body.total_rows) {
 				var userRecord = body.rows[0].id;
 				db.get(userRecord, function (err, body) {
-					console.log('huh');
 					callback(err, body);
 				});
 			}
@@ -29,6 +29,9 @@ DbHelper.prototype.getUser = function getUser(sessid, callback) {
 	});
 };
 
+DbHelper.prototype.deleteUser = function (user, callback) {
+	db.destroy(user._id, user._rev, callback);
+}
 
 // internal
 function _insertDoc(doc, params, tried, callback) {

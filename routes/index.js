@@ -4,52 +4,67 @@ var express = require('express')
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  // get the session, does the user have one?
-  /*
-  PULL THE USER STATE FROM THE DATA STORE CHECK THE PROVIDER AND STUFF
-  ALSO PUT THE PROVIDER IN THE DATA STORE
-  HOOKUP THE LOGOUT
-  DELETE TOKENS IF THEYRE EXPIRED
-  */
-  var sid = req.sessionID;
   var user = req.user;
-  if (user) {
-    console.log(JSON.stringify(user));
-  } else {
-    console.error("No user found");
-  }
   var userState = {
     title: 'Express',
     azure: false,
     google: false
   };
   if (user) {
-    if (hasProvider(user, 'azure') && isValid('azure', sid)) {
-      userState.azure = true;
-    } else if (hasProvider(user, 'google') && isValid('google', sid)) {
-      userState.google = true;
-    }
-  }
-  res.render('index', userState);
-  console.log("Requestor: [" + req.sessionID + "]");
-});
-
-function hasProvider(user, sought) {
-  var hasProvider;
-  if (user.providers) {
-    user.providers.forEach(function (provider) {
-      console.log('name: ' + provider.providerName);
-      if (provider.providerName === sought) {
-        hasProvider = true;
-      }
+    assessUserState(userState, user);
+    console.log(JSON.stringify(user));
+    res.render('index', userState);
+    console.log("Requestor: [" + req.sessionID + "]");
+  } else {
+    dbHelper.getUser(req.sessionID, function (err, user) {
+      req.user = user;
+      assessUserState(userState, user);
+      res.render('index', userState);
+      console.log("Requestor: [" + req.sessionID + "]");
     });
   }
-  return hasProvider;
+});
+
+function assessUserState(state, user) {
+  if (user) {
+    if (hasProvider(user, 'azure') && isValid(user, 'azure')) {
+      state.azure = true;
+    } else if (hasProvider(user, 'google') && isValid(user, 'google')) {
+      state.google = true;
+    }
+  }
+}
+
+function hasProvider(user, sought) {
+  return getServiceByName(user, sought);
 }
 
 // TODO method stub
-function isValid(service, sessionID) {
-  return true;
+function isValid(user, service) {
+  var provider = getServiceByName(user, service);
+  console.log("Found service - " + JSON.stringify(provider));
+  var currentTimeSeconds = Math.round(new Date().getTime() / 1000);
+  if (currentTimeSeconds < provider.accessTokenExpiry) {
+    console.log('token: valid');
+    return true;
+  } else {
+    console.error('token: expired');
+    dbHelper.deleteUser(user);
+  }
+  return false;
+}
+
+function getServiceByName(user, serviceName) {
+  var service;
+  if (user.providers) {
+    user.providers.forEach(function (provider) {
+      if (serviceName === provider.providerName) {
+        console.log('Found service: ' + serviceName);
+        service = provider;
+      }
+    });
+  }
+  return service;
 }
 
 module.exports = router;

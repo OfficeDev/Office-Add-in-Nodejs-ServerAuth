@@ -105,7 +105,6 @@ passport.serializeUser(function (user, done) {
 });
 
 passport.deserializeUser(function (sessid, done) {
-  console.log('here?');
   dbHelperInstance.getUser(sessid, function (err, user) {
     done(null, user);
   });
