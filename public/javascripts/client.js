@@ -8,7 +8,9 @@ socket.on('init', function (data) {
 
 socket.on('auth_success', function (data) {
 	console.log(JSON.stringify(data));
-	if (data.provider === 'azure') {
+	// obviously this shouldn't *actually* work this way,
+	// but I didn't want to totally break the UI updating
+	if (data.providers[0].providerName === 'azure') {
 		$('#azure_disconnected').css('display', 'none');
 		$('#azure_connected').css('display', 'block');
 	}

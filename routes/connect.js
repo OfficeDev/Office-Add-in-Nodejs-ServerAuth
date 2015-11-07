@@ -33,10 +33,26 @@ router.get('/azure/callback',
 router.get('/close', function (req, res) {
   res.render('auth_complete');
   console.log("Successfully authenticated user:\n" + JSON.stringify(req.user));
-  io.to(req.sessionID).emit('auth_success', {
-    provider: 'azure',
-    event: 'authentication complete'
-  });
+  var serviceIndex;
+  for (var ii = 0; ii < req.user.providers.length; ii++) {
+    if ("azure" === req.user.providers[ii].providerName) {
+      serviceIndex = ii;
+      break;
+    }
+  }
+  var provider = req.user.providers[ii];
+  var ltdUser = {
+    providers: [
+      {
+        providerName: "azure",
+        // this is the name of the user, as known by the provider
+        name: provider.name,
+        // the email
+        givenName: provider.uniqueName
+      }
+    ]
+  }
+  io.to(req.sessionID).emit('auth_success', ltdUser);
 });
 
 router.get('/error', function (req, res) {
