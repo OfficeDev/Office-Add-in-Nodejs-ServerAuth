@@ -9,8 +9,8 @@ block content
 
     // Azure
     div#azure_disconnected(style=(azure ? 'display:none' : 'display:blobk') class='ms-ListItem')
-      a(
-        class='ms-ListItem-primaryText',
+      div(
+        class='ms-ListItem-primaryText ms-Link',
         title='Connect to Azure',
         onclick="window.open('/connect/azure', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
       span(class='ms-ListItem-secondaryText') Status: Disconnected
