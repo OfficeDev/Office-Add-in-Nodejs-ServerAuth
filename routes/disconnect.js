@@ -23,7 +23,8 @@ var express = require('express')
 // });
 
 router.get('/azure', function(req, res) {
-  // Destroy the cookies related to the service
+  // In some apps, you'd have to delete objects that you have stored
+  // in the session object. This is not the case of this sample. 
   
   // Update the document in the DB
   
