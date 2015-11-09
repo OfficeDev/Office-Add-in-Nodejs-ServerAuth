@@ -21,6 +21,7 @@ var path = require('path')
   , azureConfig = require('./ws-conf').azureConf
   , routes = require('./routes/index')
   , connect = require('./routes/connect')
+  , disconnect = require('./routes/disconnect')
   , dbHelperInstance = new (require('./db-helper'))()
   , jwt = require('jsonwebtoken')
   , ONE_DAY_MILLIS = 86400000;
@@ -98,6 +99,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/connect', connect);
+app.use('/disconnect', disconnect);
 
 passport.serializeUser(function (user, done) {
   // keep those sessions light!
