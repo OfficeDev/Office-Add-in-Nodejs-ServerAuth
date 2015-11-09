@@ -29,6 +29,10 @@ router.get('/', function (req, res, next) {
 
 function assessUserState(state, user) {
   if (user) {
+    var azure = getServiceByName(user, 'azure');
+    if (azure) {
+      state.azureName = azure.name;
+    }
     if (hasProvider(user, 'azure') && isValid(user, 'azure')) {
       state.azure = true;
     } else if (hasProvider(user, 'google') && isValid(user, 'google')) {

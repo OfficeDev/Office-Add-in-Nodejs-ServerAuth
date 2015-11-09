@@ -18,7 +18,7 @@ block content
     div#azure_connected(style=(azure ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
       span(class='ms-ListItem-primaryText', title='Connect to Azure') Sign in with Azure
       span(class='ms-ListItem-secondaryText') Status: Connected
-      span#azure_name(class='ms-ListItem-secondaryText')
+      span#azure_name(class='ms-ListItem-secondaryText') Name: #{azureName}
       div(class='ms-ListItem-actions')
         a(class='ms-ListItem-action', href='/disconnect/azure')
           i(class='ms-Icon ms-Icon--x', title='Disconnect from Azure')
