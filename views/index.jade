@@ -12,7 +12,7 @@ block content
       a(
         class='ms-ListItem-primaryText',
         title='Connect to Azure',
-        href="javascript:window.open('/connect/azure', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
+        onclick="window.open('/connect/azure', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
       span(class='ms-ListItem-secondaryText') Status: Disconnected
 
     div#azure_connected(style=(azure ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
