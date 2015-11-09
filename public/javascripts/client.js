@@ -7,11 +7,15 @@ socket.on('init', function (data) {
 });
 
 socket.on('auth_success', function (data) {
-	console.log(JSON.stringify(data));
-	// obviously this shouldn't *actually* work this way,
-	// but I didn't want to totally break the UI updating
-	if (data.providers[0].providerName === 'azure') {
-		$('#azure_disconnected').css('display', 'none');
-		$('#azure_connected').css('display', 'block');
+	console.log('auth_success: ' + JSON.stringify(data));
+	// Show the 'connected' UI for the providers
+	// that the user has signed-in.
+	var provider;
+	for (var i = 0; i < data.providers.length; i++)  {
+		var providerName = data.providers[i].providerName;
+		var name = data.providers[i].name;
+		$('#' + providerName + '_disconnected').css('display', 'none');
+		$('#' + providerName + '_connected').css('display', 'block');
+		$('#' + providerName + '_name').text('Name: ' + name);
 	}
 });
