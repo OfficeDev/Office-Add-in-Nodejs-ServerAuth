@@ -37,8 +37,7 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
 
     var userData = {};
     userData.sessid = req.sessionID;
-    // FIXME
-    // this will have to change when there are more providers
+
     if (!userData.providers) {
       userData.providers = [];
     }
@@ -54,17 +53,11 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
       uniqueName: aadProfile.unique_name,
       ver: aadProfile.ver
     });
-    
-    // TODO persist this object - just testing for now...
-    // So I reckon what happens is that I can insert a record and
-    // then put that object on the user session so I can rehydrate
-    // that user later
+
     dbHelperInstance.insertDoc(userData, null,
       function (err, body) {
         if (!err) {
           console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
-          // include the db id in the user session for lookup?
-          userData.id = body.id;
         }
         done(null, userData);
       });
