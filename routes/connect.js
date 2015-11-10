@@ -1,11 +1,25 @@
 var express = require('express')
   , router = express.Router()
   , passport = require('passport')
-  , io = require('../app');
+  , io = require('../app')
+  , cookie = require("cookie")
+  , cookieParser = require('cookie-parser')
+  , dbHelper = new (require('../db-helper'))();
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');
-  socket.emit('init', "connection est")
+  var jsonCookie =
+    cookie.parse(socket
+      .handshake
+      .headers
+      .cookie);
+  var decodedNodeCookie =
+    cookieParser
+      .signedCookie(jsonCookie.nodecookie, 'keyboard cat');
+  console.log('de-signed cookie: ' + decodedNodeCookie);
+  // the sessionId becomes the room name for this session
+  socket.join(decodedNodeCookie);
+  io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
 
 router.get('/azure', passport.authenticate('azure'));
@@ -19,8 +33,26 @@ router.get('/azure/callback',
 router.get('/close', function (req, res) {
   res.render('auth_complete');
   console.log("Successfully authenticated user:\n" + JSON.stringify(req.user));
-  // transmit this data back over the socket?
-  console.log("session id: " + req.sessionID);
+  var serviceIndex;
+  for (var ii = 0; ii < req.user.providers.length; ii++) {
+    if ("azure" === req.user.providers[ii].providerName) {
+      serviceIndex = ii;
+      break;
+    }
+  }
+  var provider = req.user.providers[ii];
+  var ltdUser = {
+    providers: [
+      {
+        providerName: "azure",
+        // this is the name of the user, as known by the provider
+        name: provider.name,
+        // the email
+        givenName: provider.uniqueName
+      }
+    ]
+  }
+  io.to(req.sessionID).emit('auth_success', ltdUser);
 });
 
 router.get('/error', function (req, res) {

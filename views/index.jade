@@ -8,26 +8,27 @@ block content
   div(class='ms-List')
 
     // Azure
-    div#azure_disconnected(class='ms-ListItem')
-      a(
-        class='ms-ListItem-primaryText',
+    div#azure_disconnected(style=(azure ? 'display:none' : 'display:blobk') class='ms-ListItem')
+      div(
+        class='ms-ListItem-primaryText ms-Link',
         title='Connect to Azure',
-        href="javascript:window.open('/connect/azure', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
+        onclick="window.open('/connect/azure', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
       span(class='ms-ListItem-secondaryText') Status: Disconnected
 
-    div#azure_connected(style='display:none' class='ms-ListItem is-selected')
+    div#azure_connected(style=(azure ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
       span(class='ms-ListItem-primaryText', title='Connect to Azure') Sign in with Azure
       span(class='ms-ListItem-secondaryText') Status: Connected
+      span#azure_name(class='ms-ListItem-secondaryText') Name: #{azureName}
       div(class='ms-ListItem-actions')
         a(class='ms-ListItem-action', href='/disconnect/azure')
           i(class='ms-Icon ms-Icon--x', title='Disconnect from Azure')
 
     // Google
-    div#google_disconnected(class='ms-ListItem')
+    div#google_disconnected(style=(google ? 'display:none' : 'display:block') class='ms-ListItem')
       a(class='ms-ListItem-primaryText', title='Connect to Google', href="javascript:window.open('/connect/google')") Sign in with Google
       span(class='ms-ListItem-secondaryText') Status: Disconnected
 
-    div#google_connected(style='display:none' class='ms-ListItem is-selected')
+    div#google_connected(style=(google ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
       span(class='ms-ListItem-primaryText', title='Connect to Google') Sign in with Google
       span(class='ms-ListItem-secondaryText') Status: Connected
       div(class='ms-ListItem-actions')
