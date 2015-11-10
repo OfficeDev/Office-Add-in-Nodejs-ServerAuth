@@ -33,16 +33,12 @@ function assessUserState(state, user) {
     if (azure) {
       state.azureName = azure.name;
     }
-    if (hasProvider(user, 'azure') && isValid(user, 'azure')) {
+    if (getServiceByName(user, 'azure') && isValid(user, 'azure')) {
       state.azure = true;
-    } else if (hasProvider(user, 'google') && isValid(user, 'google')) {
+    } else if (getServiceByName(user, 'google') && isValid(user, 'google')) {
       state.google = true;
     }
   }
-}
-
-function hasProvider(user, sought) {
-  return getServiceByName(user, sought);
 }
 
 // TODO method stub
