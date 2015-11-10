@@ -35,8 +35,10 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
     var accessTokenExpiry =
       jwt.decode(accessToken, { complete: true }).payload.exp;
 
-    var userData = {};
-    userData.sessid = req.sessionID;
+    var userData = req.user || {};
+    if (!userData.sessid) {
+      userData.sessid = req.sessionID;
+    }
 
     if (!userData.providers) {
       userData.providers = [];
