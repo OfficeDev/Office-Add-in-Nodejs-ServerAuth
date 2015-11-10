@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  h1.ms-font-xxl Welcome
+  p.ms-font-l The AuthServer sample shows how to conect to third party services that adhere to the OAuth 2.0 specification.
+  p.ms-font-l Click the services below to start the authentication flow with each of the services.
+  
+  div(class='ms-List')
+
+    // Azure
+    div#azure_disconnected(style=(azure ? 'display:none' : 'display:blobk') class='ms-ListItem')
+      div(
+        class='ms-ListItem-primaryText ms-Link',
+        title='Connect to Azure',
+        onclick="window.open('/connect/azure', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
+      span(class='ms-ListItem-secondaryText') Status: Disconnected
+
+    div#azure_connected(style=(azure ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
+      span(class='ms-ListItem-primaryText', title='Connect to Azure') Sign in with Azure
+      span(class='ms-ListItem-secondaryText') Status: Connected
+      span#azure_name(class='ms-ListItem-secondaryText') Name: #{azureName}
+      div(class='ms-ListItem-actions')
+        a(class='ms-ListItem-action', href='/disconnect/azure')
+          i(class='ms-Icon ms-Icon--x', title='Disconnect from Azure')
+
+    // Google
+    div#google_disconnected(style=(google ? 'display:none' : 'display:block') class='ms-ListItem')
+      a(class='ms-ListItem-primaryText', title='Connect to Google', href="javascript:window.open('/connect/google')") Sign in with Google
+      span(class='ms-ListItem-secondaryText') Status: Disconnected
+
+    div#google_connected(style=(google ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
+      span(class='ms-ListItem-primaryText', title='Connect to Google') Sign in with Google
+      span(class='ms-ListItem-secondaryText') Status: Connected
+      div(class='ms-ListItem-actions')
+        a(class='ms-ListItem-action', href='/disconnect/google')
+          i(class='ms-Icon ms-Icon--x', title='Disconnect from Google')
+            
+  p.ms-font-l When you're done, click the (x) to disconnect from the service.
+  // is there a way to avoid hardcoding this proto:host:port?
+  script(type='text/javascript' src='https://localhost:3001/socket.io/socket.io.js')
+  script(type='text/javascript' src='https://code.jquery.com/jquery-2.1.4.min.js')
+  script(type='text/javascript' src='/javascripts/client.js')
