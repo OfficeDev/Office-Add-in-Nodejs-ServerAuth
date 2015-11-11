@@ -10,10 +10,13 @@ function disconnectService(user, serviceName) {
   // remove the supplied service from the provided user
   for (var ii = 0; ii < user.providers.length; ii++) {
     if (user.providers[ii].providerName === serviceName) {
-      user.providers.splice[ii, 1];
-      break;
+      user.providers.splice(ii, 1);
+      console.log("\n\nuser coming back: " + JSON.stringify(user));
+      return user;
     }
   }
+  console.log("\n\nskipped user: " + JSON.stringify(user));
+  return user;
 }
 
 function getAppUrl(req) {
@@ -22,10 +25,12 @@ function getAppUrl(req) {
 
 router.get('/google', function (req, res) {
   var updatedUser = req.user;
-  disconnectService(updatedUser, 'google');
+  updatedUser = disconnectService(updatedUser, 'google');
   dbHelper.insertDoc(updatedUser, null, function (err, body) {
     var appUrl = getAppUrl(req);
-    var logoutUrl = '' + appUrl;
+    var logoutUrl = 'https://www.google.com/accounts/Logout'
+      + '?continue=https://appengine.google.com/_ah/logout?continue='
+      + appUrl;
     res.redirect(logoutUrl);
   });
 });
@@ -38,7 +43,7 @@ router.get('/azure', function (req, res) {
   var updatedUser = req.user;
   
   // Remove the azure provider from the user object
-  disconnectService(updatedUser, 'azure');
+  updatedUser = disconnectService(updatedUser, 'azure');
   
   // Remove the azure provider from the document
   dbHelper.insertDoc(updatedUser, null, function (err, body) {
