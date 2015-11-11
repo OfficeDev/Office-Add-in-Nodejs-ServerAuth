@@ -30,17 +30,40 @@ var path = require('path')
 
 // teach passport how to use Google
 passport.use(new GoogleStrategy(googleConfig,
-  function (accessToken, refreshToken, profile, done) {
+  function (req, accessToken, refreshToken, profile, done) {
     console.log('google accessToken: ' + accessToken);
     console.log('google refresh token: ' + refreshToken);
     console.log('google profile: ' + JSON.stringify(profile));
-    // TODO - what needs to be done now?
-    // ok - what needs to be done now...
-    // redirect the auth window to close
-    // serialize the google user into the session
+
+    // get the user or init a new one
+    var userData = req.user || {};
+    if (!userData.sessid) {
+      userData.sessid = req.sessionID;
+    }
+    if (!userData.providers) {
+      userData.providers = [];
+    }
+
+    userData.providers.push({
+      accessToken: accessToken,
+      providerName: profile.provider,
+      accessTokenExpiry: '',
+      refreshToken: refreshToken,
+      familyName: profile.name.familyName,
+      givenName: profile.name.givenName,
+      name: profile.displayName
+    });
+
+    dbHelperInstance.insertDoc(userData, null,
+      function (err, body) {
+        if (!err) {
+          console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
+        }
+        done(err, userData);
+      });
+
     // signal the client window (via socket) to update
     // update the user record in the db
-    return done(null, {});
   }
   ));
 
@@ -80,6 +103,7 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
         if (!err) {
           console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
         }
+        // TODO should this really be null? Or should be the err instance?
         done(null, userData);
       });
   }));

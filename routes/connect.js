@@ -4,7 +4,11 @@ var express = require('express')
   , io = require('../app')
   , cookie = require("cookie")
   , cookieParser = require('cookie-parser')
-  , dbHelper = new (require('../db-helper'))();
+  , dbHelper = new (require('../db-helper'))()
+  , passportRedirectConfig = {
+    successRedirect: '/connect/close',
+    failureRedirect: '/connect/error'
+  };
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');
@@ -23,45 +27,30 @@ io.on('connection', function (socket) {
 });
 
 router.get('/auth/google',
-  passport.authenticate('google', { scope: 'profile' }));
+  passport.authenticate('google', { scope: 'profile', accessType: 'offline' }));
 
 router.get('/auth/google/callback',
-  passport.authenticate('google', {
-    successRedirect: '/connect/close',
-    failureRedirect: '/connect/error'
-  }));
+  passport.authenticate('google', passportRedirectConfig));
 
 router.get('/azure', passport.authenticate('azure'));
 
 router.get('/azure/callback',
-  passport.authenticate('azure', {
-    successRedirect: '/connect/close',
-    failureRedirect: '/connect/error'
-  }));
+  passport.authenticate('azure', passportRedirectConfig));
 
 router.get('/close', function (req, res) {
   res.render('auth_complete');
-  console.log("Successfully authenticated user:\n" + JSON.stringify(req.user));
-  var serviceIndex;
-  for (var ii = 0; ii < req.user.providers.length; ii++) {
-    if ("azure" === req.user.providers[ii].providerName) {
-      serviceIndex = ii;
-      break;
-    }
+  var user = req.user;
+
+  var providers = [];
+  for (var ii = 0; ii < user.providers.length; ii++) {
+    var provider = user.providers[ii];
+    providers.push({
+      providerName: provider.providerName,
+      displayName: provider.uniqueName || provider.name
+    });
   }
-  var provider = req.user.providers[ii];
-  var ltdUser = {
-    providers: [
-      {
-        providerName: "azure",
-        // this is the name of the user, as known by the provider
-        name: provider.name,
-        // the email
-        givenName: provider.uniqueName
-      }
-    ]
-  }
-  io.to(req.sessionID).emit('auth_success', ltdUser);
+
+  io.to(req.sessionID).emit('auth_success', providers);
 });
 
 router.get('/error', function (req, res) {
