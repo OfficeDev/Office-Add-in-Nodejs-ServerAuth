@@ -35,7 +35,7 @@ function assessUserState(state, user) {
     }
     if (getServiceByName(user, 'azure') && isValid(user, 'azure')) {
       state.azure = true;
-    } else if (getServiceByName(user, 'google') && isValid(user, 'google')) {
+    } else if (getServiceByName(user, 'google')) {
       state.google = true;
     }
   }
