@@ -22,6 +22,17 @@ io.on('connection', function (socket) {
   io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
 
+router.get('/auth/google',
+  passport.authenticate('google', { scope: 'profile' }));
+
+router.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/connect/error' }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    console.log('Google auth success');
+    res.redirect('/');
+  });
+
 router.get('/azure', passport.authenticate('azure'));
 
 router.get('/azure/callback',

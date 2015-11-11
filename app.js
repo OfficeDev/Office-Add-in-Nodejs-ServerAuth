@@ -19,12 +19,30 @@ var path = require('path')
   , session = require('express-session')
   , AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
   , azureConfig = require('./ws-conf').azureConf
+  , googleConfig = require('./ws-conf').googleConf
   , routes = require('./routes/index')
   , connect = require('./routes/connect')
   , disconnect = require('./routes/disconnect')
   , dbHelperInstance = new (require('./db-helper'))()
   , jwt = require('jsonwebtoken')
-  , ONE_DAY_MILLIS = 86400000;
+  , ONE_DAY_MILLIS = 86400000
+  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+
+// teach passport how to use Google
+passport.use(new GoogleStrategy(googleConfig,
+  function (accessToken, refreshToken, profile, done) {
+    console.log('google accessToken: ' + accessToken);
+    console.log('google refresh token: ' + refreshToken);
+    console.log('google profile: ' + JSON.stringify(profile));
+    // TODO - what needs to be done now?
+    // ok - what needs to be done now...
+    // redirect the auth window to close
+    // serialize the google user into the session
+    // signal the client window (via socket) to update
+    // update the user record in the db
+    return done(null, {});
+  }
+  ));
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
