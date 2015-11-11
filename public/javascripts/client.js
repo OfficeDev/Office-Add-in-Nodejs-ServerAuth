@@ -12,7 +12,7 @@ socket.on('auth_success', function (providers) {
 	// that the user has signed-in.
 	for (var ii = 0; ii < providers.length; ii++) {
 		var providerName = providers[ii].providerName;
-		var name = providers[ii].name;
+		var name = providers[ii].displayName;
 		$('#' + providerName + '_disconnected').css('display', 'none');
 		$('#' + providerName + '_connected').css('display', 'block');
 		$('#' + providerName + '_name').text('Name: ' + name);

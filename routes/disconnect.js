@@ -6,7 +6,31 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , dbHelper = new (require('../db-helper'))();
 
-router.get('/azure', function(req, res) {
+function disconnectService(user, serviceName) {
+  // remove the supplied service from the provided user
+  for (var ii = 0; ii < user.providers.length; ii++) {
+    if (user.providers[ii].providerName === serviceName) {
+      user.providers.splice[ii, 1];
+      break;
+    }
+  }
+}
+
+function getAppUrl(req) {
+  return encodeURIComponent(req.protocol + '://' + req.get('host'));
+}
+
+router.get('/google', function (req, res) {
+  var updatedUser = req.user;
+  disconnectService(updatedUser, 'google');
+  dbHelper.insertDoc(updatedUser, null, function (err, body) {
+    var appUrl = getAppUrl(req);
+    var logoutUrl = '' + appUrl;
+    res.redirect(logoutUrl);
+  });
+});
+
+router.get('/azure', function (req, res) {
   // In some apps, you'd have to delete objects that you have stored
   // in the session object. This is not the case of this sample. 
   
@@ -14,21 +38,16 @@ router.get('/azure', function(req, res) {
   var updatedUser = req.user;
   
   // Remove the azure provider from the user object
-  for(var i = 0; i < updatedUser.providers.length; i++) {
-    if(updatedUser.providers[i].providerName === 'azure') {
-      updatedUser.providers.splice(i, 1);
-      break;
-    }
-  }
+  disconnectService(updatedUser, 'azure');
   
   // Remove the azure provider from the document
-  dbHelper.insertDoc(updatedUser, null, function(err, body) {
-    if(body.ok) {
+  dbHelper.insertDoc(updatedUser, null, function (err, body) {
+    if (body.ok) {
       // Get the full URL of root to send it to the logout endpoint
-      var appUrl =  encodeURIComponent(req.protocol + '://' + req.get('host'));
-      var redirectUrl = 
-      'https://login.microsoftonline.com/common/oauth2/logout' + 
-      '?post_logout_redirect_uri=' + appUrl; 
+      var appUrl = getAppUrl(req);
+      var redirectUrl =
+        'https://login.microsoftonline.com/common/oauth2/logout' +
+        '?post_logout_redirect_uri=' + appUrl;
       res.redirect(redirectUrl);
     } else {
       console.log('Error updating document: ' + err);
