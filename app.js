@@ -71,7 +71,7 @@ passport.use(new GoogleStrategy(googleConfig,
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (req, accessToken, refreshToken, params, profile, done) {
-    dbHelper.getUser(req.sessionID, function (err, user) {
+    dbHelper.getUser(req.query.state, function (err, user) {
       var aadProfile = jwt.decode(params.id_token);
       console.log('User: ' + JSON.stringify(user));
       // Extract the access token expiration date as a unix
@@ -81,7 +81,7 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   
       var userData = user || {};
       if (!userData.sessid) {
-        userData.sessid = req.sessionID;
+        userData.sessid = req.query.state;
       }
   
       if (!userData.providers) {

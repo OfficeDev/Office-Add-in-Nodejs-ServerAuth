@@ -35,7 +35,7 @@ router.get('/auth/google/callback',
 router.get('/azure/:sessionID', function(req, res, next) {
   passport.authenticate(
     'azure', 
-    { state: req.params.sessionid },
+    { state: req.params.sessionID },
     function (err, user) {
       var providers = [];
       for (var ii = 0; ii < user.providers.length; ii++) {
