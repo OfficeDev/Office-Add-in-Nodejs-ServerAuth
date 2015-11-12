@@ -35,28 +35,28 @@ router.get('/google', function (req, res) {
   });
 });
 
-router.get('/azure', function (req, res) {
+router.get('/azure/:sessionID', function (req, res) {
   // In some apps, you'd have to delete objects that you have stored
   // in the session object. This is not the case of this sample. 
-  
-  // Get a temporary user object from the request
-  var updatedUser = req.user;
-  
-  // Remove the azure provider from the user object
-  updatedUser = disconnectService(updatedUser, 'azure');
-  
-  // Remove the azure provider from the document
-  dbHelper.insertDoc(updatedUser, null, function (err, body) {
-    if (body.ok) {
-      // Get the full URL of root to send it to the logout endpoint
-      var appUrl = getAppUrl(req);
-      var redirectUrl =
-        'https://login.microsoftonline.com/common/oauth2/logout' +
-        '?post_logout_redirect_uri=' + appUrl;
-      res.redirect(redirectUrl);
-    } else {
-      console.log('Error updating document: ' + err);
-    }
+  dbHelper.getUser(req.params.sessionID, function (err, user) {
+    console.log('Azure/sessionID: ' + JSON.stringify(err));
+    // Get a temporary user object from the request
+    // Remove the azure provider from the user object
+    var updatedUser = disconnectService(user, 'azure');
+    
+    // Remove the azure provider from the document
+    dbHelper.insertDoc(updatedUser, null, function(err, body) {
+      if(body.ok) {
+        // Get the full URL of root to send it to the logout endpoint
+        var appUrl =  getAppUrl(req);
+        var redirectUrl = 
+        'https://login.microsoftonline.com/common/oauth2/logout' + 
+        '?post_logout_redirect_uri=' + appUrl; 
+        res.redirect(redirectUrl);
+      } else {
+        console.log('Error updating document: ' + err);
+      }
+    });
   });
 });
 

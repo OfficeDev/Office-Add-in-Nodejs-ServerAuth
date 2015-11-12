@@ -20,7 +20,7 @@ block content
       span(class='ms-ListItem-secondaryText') Status: Connected
       span#azure_name(class='ms-ListItem-secondaryText') Name: #{azureName}
       div(class='ms-ListItem-actions')
-        a(class='ms-ListItem-action', href='/disconnect/azure')
+        a(class='ms-ListItem-action', href='/disconnect/azure/#{sessionID}')
           i(class='ms-Icon ms-Icon--x', title='Disconnect from Azure')
 
     // Google
