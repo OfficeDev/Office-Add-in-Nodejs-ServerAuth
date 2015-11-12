@@ -32,25 +32,27 @@ router.get('/auth/google',
 router.get('/auth/google/callback',
   passport.authenticate('google', passportRedirectConfig));
 
-router.get('/azure', passport.authenticate('azure'));
+router.get('/azure/:sessionID', function(req, res, next) {
+  passport.authenticate(
+    'azure', 
+    { state: req.params.sessionid },
+    function (err, user) {
+      var providers = [];
+      for (var ii = 0; ii < user.providers.length; ii++) {
+        var provider = user.providers[ii];
+        providers.push({
+          providerName: provider.providerName,
+          displayName: provider.uniqueName || provider.name
+        });
+      }
+      io.to(user.sessid).emit('auth_success', providers);
+      next();
+    }
+  )(req, res, next);
+});
 
-router.get('/azure/callback',
-  passport.authenticate('azure', passportRedirectConfig));
-
-router.get('/close', function (req, res) {
+router.get('/azure/callback', function(req, res, next) {
   res.render('auth_complete');
-  var user = req.user;
-
-  var providers = [];
-  for (var ii = 0; ii < user.providers.length; ii++) {
-    var provider = user.providers[ii];
-    providers.push({
-      providerName: provider.providerName,
-      displayName: provider.uniqueName || provider.name
-    });
-  }
-
-  io.to(req.sessionID).emit('auth_success', providers);
 });
 
 router.get('/error', function (req, res) {
