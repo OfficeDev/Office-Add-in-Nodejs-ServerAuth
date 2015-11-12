@@ -4,11 +4,7 @@ var express = require('express')
   , io = require('../app')
   , cookie = require("cookie")
   , cookieParser = require('cookie-parser')
-  , dbHelper = new (require('../db-helper'))()
-  , passportRedirectConfig = {
-    successRedirect: '/connect/close',
-    failureRedirect: '/connect/error'
-  };
+  , dbHelper = new (require('../db-helper'))();
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');
@@ -26,11 +22,31 @@ io.on('connection', function (socket) {
   io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
 
-router.get('/auth/google',
-  passport.authenticate('google', { scope: 'profile', accessType: 'offline' }));
+router.get('/auth/google/:sessionID', function(req, res, next) {
+  passport.authenticate('google', 
+    { 
+      scope: 'profile', 
+      accessType: 'offline', 
+      state : req.params.sessionID 
+    },
+    function(err, user) {
+      var providers = [];
+      for (var ii = 0; ii < user.providers.length; ii++) {
+        var provider = user.providers[ii];
+        providers.push({
+          providerName: provider.providerName,
+          displayName: provider.name
+        });
+      }
+      io.to(user.sessid).emit('auth_success', providers);
+      next();
+    }
+  )(req, res, next);
+});
 
-router.get('/auth/google/callback',
-  passport.authenticate('google', passportRedirectConfig));
+router.get('/auth/google/callback', function(req, res, next) {
+  res.render('auth_complete');
+});
 
 router.get('/azure/:sessionID', function(req, res, next) {
   passport.authenticate(
@@ -42,7 +58,7 @@ router.get('/azure/:sessionID', function(req, res, next) {
         var provider = user.providers[ii];
         providers.push({
           providerName: provider.providerName,
-          displayName: provider.uniqueName || provider.name
+          displayName: provider.name
         });
       }
       io.to(user.sessid).emit('auth_success', providers);

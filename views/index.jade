@@ -28,14 +28,15 @@ block content
       div(
         class='ms-ListItem-primaryText ms-Link',
         title='Connect to Google',
-        onclick="window.open('/connect/auth/google', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Google
+        onclick="window.open('/connect/auth/google/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Google
       span(class='ms-ListItem-secondaryText') Status: Disconnected
 
     div#google_connected(style=(google ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
       span(class='ms-ListItem-primaryText', title='Connect to Google') Sign in with Google
       span(class='ms-ListItem-secondaryText') Status: Connected
+      span#google_name(class='ms-ListItem-secondaryText') Name: #{googleName}
       div(class='ms-ListItem-actions')
-        a(class='ms-ListItem-action', href='/disconnect/google')
+        a(class='ms-ListItem-action', href='/disconnect/google/#{sessionID}')
           i(class='ms-Icon ms-Icon--x', title='Disconnect from Google')
             
   p.ms-font-l When you're done, click the (x) to disconnect from the service.

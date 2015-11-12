@@ -23,23 +23,30 @@ function getAppUrl(req) {
   return encodeURIComponent(req.protocol + '://' + req.get('host'));
 }
 
-router.get('/google', function (req, res) {
-  var updatedUser = req.user;
-  updatedUser = disconnectService(updatedUser, 'google');
-  dbHelper.insertDoc(updatedUser, null, function (err, body) {
-    var appUrl = getAppUrl(req);
-    var logoutUrl = 'https://www.google.com/accounts/Logout'
-      + '?continue=https://appengine.google.com/_ah/logout?continue='
-      + appUrl;
-    res.redirect(logoutUrl);
+router.get('/google/:sessionID', function (req, res) {
+  dbHelper.getUser(req.params.sessionID, function (err, user) {
+    // Get a temporary user object from the request
+    // Remove the azure provider from the user object
+    var updatedUser = disconnectService(user, 'google');
+    
+    // Remove the azure provider from the document
+    dbHelper.insertDoc(updatedUser, null, function(err, body) {
+      if(body.ok) {
+        // Get the full URL of root to send it to the logout endpoint
+        var appUrl = getAppUrl(req);
+        var logoutUrl = 'https://www.google.com/accounts/Logout'
+          + '?continue=https://appengine.google.com/_ah/logout?continue='
+          + appUrl;
+        res.redirect(logoutUrl);
+      } else {
+        console.log('Error updating document: ' + err);
+      }
+    });
   });
 });
 
 router.get('/azure/:sessionID', function (req, res) {
-  // In some apps, you'd have to delete objects that you have stored
-  // in the session object. This is not the case of this sample. 
   dbHelper.getUser(req.params.sessionID, function (err, user) {
-    console.log('Azure/sessionID: ' + JSON.stringify(err));
     // Get a temporary user object from the request
     // Remove the azure provider from the user object
     var updatedUser = disconnectService(user, 'azure');
@@ -49,10 +56,10 @@ router.get('/azure/:sessionID', function (req, res) {
       if(body.ok) {
         // Get the full URL of root to send it to the logout endpoint
         var appUrl =  getAppUrl(req);
-        var redirectUrl = 
+        var logoutUrl = 
         'https://login.microsoftonline.com/common/oauth2/logout' + 
         '?post_logout_redirect_uri=' + appUrl; 
-        res.redirect(redirectUrl);
+        res.redirect(logoutUrl);
       } else {
         console.log('Error updating document: ' + err);
       }

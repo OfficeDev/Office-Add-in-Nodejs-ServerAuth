@@ -32,41 +32,42 @@ var path = require('path')
 // teach passport how to use Google
 passport.use(new GoogleStrategy(googleConfig,
   function (req, accessToken, refreshToken, profile, done) {
-    console.log('google accessToken: ' + accessToken);
-    console.log('google refresh token: ' + refreshToken);
-    console.log('google profile: ' + JSON.stringify(profile));
-
-    // get the user or init a new one
-    var userData = req.user || {};
-    if (!userData.sessid) {
-      userData.sessid = req.sessionID;
-    }
-    if (!userData.providers) {
-      userData.providers = [];
-    }
-
-    userData.providers.push({
-      accessToken: accessToken,
-      providerName: profile.provider,
-      accessTokenExpiry: '',
-      refreshToken: refreshToken,
-      familyName: profile.name.familyName,
-      givenName: profile.name.givenName,
-      name: profile.displayName
-    });
-
-    dbHelperInstance.insertDoc(userData, null,
-      function (err, body) {
-        if (!err) {
-          console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
-        }
-        done(err, userData);
+    dbHelper.getUser(req.query.state, function (err, user) {
+      console.log('google accessToken: ' + accessToken);
+      console.log('google refresh token: ' + refreshToken);
+      console.log('google profile: ' + JSON.stringify(profile));
+  
+      // get the user or init a new one
+      var userData = user || {};
+      if (!userData.sessid) {
+        userData.sessid = req.query.state;
+      }
+      if (!userData.providers) {
+        userData.providers = [];
+      }
+  
+      userData.providers.push({
+        accessToken: accessToken,
+        providerName: profile.provider,
+        accessTokenExpiry: '',
+        refreshToken: refreshToken,
+        familyName: profile.name.familyName,
+        givenName: profile.name.givenName,
+        name: profile.displayName
       });
-
-    // signal the client window (via socket) to update
-    // update the user record in the db
-  }
-  ));
+  
+      dbHelperInstance.insertDoc(userData, null,
+        function (err, body) {
+          if (!err) {
+            console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
+          }
+          done(err, userData);
+        });
+  
+      // signal the client window (via socket) to update
+      // update the user record in the db
+    });
+  }));
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,

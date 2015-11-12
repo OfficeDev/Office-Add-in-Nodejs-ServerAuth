@@ -31,14 +31,17 @@ router.get('/', function (req, res, next) {
 function assessUserState(state, user) {
   if (user) {
     var azure = getServiceByName(user, 'azure');
+    var google = getServiceByName(user, 'google');
     if (azure) {
       state.azureName = azure.name;
     }
     if (azure && isValid(user, 'azure')) {
       state.azure = true;
     }
-    if (getServiceByName(user, 'google')) {
+    if (google) {
       state.google = true;
+      console.log('GoogleName: ' + google.name);
+      state.googleName = google.name;
     }
   }
 }
