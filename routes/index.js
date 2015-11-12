@@ -7,6 +7,7 @@ router.get('/', function (req, res, next) {
   var user = req.user;
   var userState = {
     title: 'Express',
+    sessionID : req.sessionID,
     azure: false,
     google: false
   };
@@ -15,14 +16,14 @@ router.get('/', function (req, res, next) {
     assessUserState(userState, user);
     console.log(JSON.stringify(user));
     res.render('index', userState);
-    console.log("Requestor: [" + req.sessionID + "]");
+    console.log("Requestor: [" + userState.sessionID + "]");
   } else {
     console.log('no sessionfound');
-    dbHelper.getUser(req.sessionID, function (err, user) {
+    dbHelper.getUser(userState.sessionID, function (err, user) {
       req.user = user;
       assessUserState(userState, user);
       res.render('index', userState);
-      console.log("Requestor: [" + req.sessionID + "]");
+      console.log("Requestor: [" + userState.sessionID + "]");
     });
   }
 });
