@@ -17,4 +17,12 @@
     <SourceLocation DefaultValue="https://localhost:3000"/>
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
+  <AppDomains>
+    <AppDomain>https://localhost:3000</AppDomain>
+    <AppDomain>https://localhost:3001</AppDomain>
+    <AppDomain>https://login.microsoftonline.com</AppDomain>
+    <AppDomain>https://graph.microsoft.com</AppDomain>
+    <AppDomain>https://www.google.com</AppDomain>
+    <AppDomain>https://appengine.google.com</AppDomain>
+  </AppDomains>
 </OfficeApp>
