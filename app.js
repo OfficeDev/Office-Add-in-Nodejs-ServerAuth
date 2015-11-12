@@ -4,6 +4,7 @@ var express = require('express')
   , certConf = require('./certconf')
 // create the socket server
   , socketServer = require('https').createServer(certConf, app)
+  , dbHelper = new (require('./db-helper'))
 // bind it to socket.io
   , io = require('socket.io')(socketServer);
 
@@ -70,42 +71,44 @@ passport.use(new GoogleStrategy(googleConfig,
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (req, accessToken, refreshToken, params, profile, done) {
-    var aadProfile = jwt.decode(params.id_token);
-    
-    // Extract the access token expiration date as a unix
-    // (millis) timestamp
-    var accessTokenExpiry =
-      jwt.decode(accessToken, { complete: true }).payload.exp;
-
-    var userData = req.user || {};
-    if (!userData.sessid) {
-      userData.sessid = req.sessionID;
-    }
-
-    if (!userData.providers) {
-      userData.providers = [];
-    }
-
-    userData.providers.push({
-      accessToken: accessToken,
-      providerName: 'azure',
-      accessTokenExpiry: accessTokenExpiry,
-      refreshToken: refreshToken,
-      familyName: aadProfile.family_name,
-      givenName: aadProfile.given_name,
-      name: aadProfile.name,
-      uniqueName: aadProfile.unique_name,
-      ver: aadProfile.ver
-    });
-
-    dbHelperInstance.insertDoc(userData, null,
-      function (err, body) {
-        if (!err) {
-          console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
-        }
-        // TODO should this really be null? Or should be the err instance?
-        done(null, userData);
+    dbHelper.getUser(req.sessionID, function (err, user) {
+      var aadProfile = jwt.decode(params.id_token);
+      console.log('User: ' + JSON.stringify(user));
+      // Extract the access token expiration date as a unix
+      // (millis) timestamp
+      var accessTokenExpiry =
+        jwt.decode(accessToken, { complete: true }).payload.exp;
+  
+      var userData = user || {};
+      if (!userData.sessid) {
+        userData.sessid = req.sessionID;
+      }
+  
+      if (!userData.providers) {
+        userData.providers = [];
+      }
+  
+      userData.providers.push({
+        accessToken: accessToken,
+        providerName: 'azure',
+        accessTokenExpiry: accessTokenExpiry,
+        refreshToken: refreshToken,
+        familyName: aadProfile.family_name,
+        givenName: aadProfile.given_name,
+        name: aadProfile.name,
+        uniqueName: aadProfile.unique_name,
+        ver: aadProfile.ver
       });
+  
+      dbHelperInstance.insertDoc(userData, null,
+        function (err, body) {
+          if (!err) {
+            console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
+          }
+          // TODO should this really be null? Or should be the err instance?
+          done(null, userData);
+        });
+    });
   }));
 
 // view engine setup
