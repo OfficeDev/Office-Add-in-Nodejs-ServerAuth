@@ -16,5 +16,22 @@ socket.on('auth_success', function (providers) {
 		$('#' + providerName + '_disconnected').css('display', 'none');
 		$('#' + providerName + '_connected').css('display', 'block');
 		$('#' + providerName + '_name').text('Name: ' + name);
+		setSelection(providerName + ' connected \nUser: ' + name);
 	}
 });
+
+(function () {
+    "use strict";
+
+    // The initialize function must be run each time a new page is loaded
+    Office.initialize = function (reason) {
+        $(document).ready(function () {
+            //app.initialize();
+        });
+    };
+})();
+
+// Writes data to the current document selection
+function setSelection(data) {
+	Office.context.document.setSelectedDataAsync(data);
+}
