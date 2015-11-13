@@ -4,6 +4,7 @@ var express = require('express')
   , certConf = require('./certconf')
 // create the socket server
   , socketServer = require('https').createServer(certConf, app)
+  , dbHelper = new (require('./db-helper'))
 // bind it to socket.io
   , io = require('socket.io')(socketServer);
 
@@ -19,51 +20,96 @@ var path = require('path')
   , session = require('express-session')
   , AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
   , azureConfig = require('./ws-conf').azureConf
+  , googleConfig = require('./ws-conf').googleConf
   , routes = require('./routes/index')
   , connect = require('./routes/connect')
   , disconnect = require('./routes/disconnect')
   , dbHelperInstance = new (require('./db-helper'))()
   , jwt = require('jsonwebtoken')
-  , ONE_DAY_MILLIS = 86400000;
+  , ONE_DAY_MILLIS = 86400000
+  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+
+// teach passport how to use Google
+passport.use(new GoogleStrategy(googleConfig,
+  function (req, accessToken, refreshToken, profile, done) {
+    dbHelper.getUser(req.query.state, function (err, user) {
+      console.log('google accessToken: ' + accessToken);
+      console.log('google refresh token: ' + refreshToken);
+      console.log('google profile: ' + JSON.stringify(profile));
+  
+      // get the user or init a new one
+      var userData = user || {};
+      if (!userData.sessid) {
+        userData.sessid = req.query.state;
+      }
+      if (!userData.providers) {
+        userData.providers = [];
+      }
+  
+      userData.providers.push({
+        accessToken: accessToken,
+        providerName: profile.provider,
+        accessTokenExpiry: '',
+        refreshToken: refreshToken,
+        familyName: profile.name.familyName,
+        givenName: profile.name.givenName,
+        name: profile.displayName
+      });
+  
+      dbHelperInstance.insertDoc(userData, null,
+        function (err, body) {
+          if (!err) {
+            console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
+          }
+          done(err, userData);
+        });
+  
+      // signal the client window (via socket) to update
+      // update the user record in the db
+    });
+  }));
 
 // teach passport how to use azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (req, accessToken, refreshToken, params, profile, done) {
-    var aadProfile = jwt.decode(params.id_token);
-    
-    // Extract the access token expiration date as a unix
-    // (millis) timestamp
-    var accessTokenExpiry =
-      jwt.decode(accessToken, { complete: true }).payload.exp;
-
-    var userData = req.user || {};
-    if (!userData.sessid) {
-      userData.sessid = req.sessionID;
-    }
-
-    if (!userData.providers) {
-      userData.providers = [];
-    }
-
-    userData.providers.push({
-      accessToken: accessToken,
-      providerName: 'azure',
-      accessTokenExpiry: accessTokenExpiry,
-      refreshToken: refreshToken,
-      familyName: aadProfile.family_name,
-      givenName: aadProfile.given_name,
-      name: aadProfile.name,
-      uniqueName: aadProfile.unique_name,
-      ver: aadProfile.ver
-    });
-
-    dbHelperInstance.insertDoc(userData, null,
-      function (err, body) {
-        if (!err) {
-          console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
-        }
-        done(null, userData);
+    dbHelper.getUser(req.query.state, function (err, user) {
+      var aadProfile = jwt.decode(params.id_token);
+      console.log('User: ' + JSON.stringify(user));
+      // Extract the access token expiration date as a unix
+      // (millis) timestamp
+      var accessTokenExpiry =
+        jwt.decode(accessToken, { complete: true }).payload.exp;
+  
+      var userData = user || {};
+      if (!userData.sessid) {
+        userData.sessid = req.query.state;
+      }
+  
+      if (!userData.providers) {
+        userData.providers = [];
+      }
+  
+      userData.providers.push({
+        accessToken: accessToken,
+        providerName: 'azure',
+        accessTokenExpiry: accessTokenExpiry,
+        refreshToken: refreshToken,
+        familyName: aadProfile.family_name,
+        givenName: aadProfile.given_name,
+        name: aadProfile.name,
+        uniqueName: aadProfile.unique_name,
+        ver: aadProfile.ver
       });
+  
+      dbHelperInstance.insertDoc(userData, null,
+        function (err, body) {
+          if (!err) {
+            console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
+          }
+          // TODO should this really be null? Or should be the err instance?
+          done(null, userData);
+        });
+    });
   }));
 
 // view engine setup

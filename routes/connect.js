@@ -22,37 +22,53 @@ io.on('connection', function (socket) {
   io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
 
-router.get('/azure', passport.authenticate('azure'));
-
-router.get('/azure/callback',
-  passport.authenticate('azure', {
-    successRedirect: '/connect/close',
-    failureRedirect: '/connect/error'
-  }));
-
-router.get('/close', function (req, res) {
-  res.render('auth_complete');
-  console.log("Successfully authenticated user:\n" + JSON.stringify(req.user));
-  var serviceIndex;
-  for (var ii = 0; ii < req.user.providers.length; ii++) {
-    if ("azure" === req.user.providers[ii].providerName) {
-      serviceIndex = ii;
-      break;
-    }
-  }
-  var provider = req.user.providers[ii];
-  var ltdUser = {
-    providers: [
-      {
-        providerName: "azure",
-        // this is the name of the user, as known by the provider
-        name: provider.name,
-        // the email
-        givenName: provider.uniqueName
+router.get('/auth/google/:sessionID', function(req, res, next) {
+  passport.authenticate('google', 
+    { 
+      scope: 'profile', 
+      accessType: 'offline', 
+      state : req.params.sessionID 
+    },
+    function(err, user) {
+      var providers = [];
+      for (var ii = 0; ii < user.providers.length; ii++) {
+        var provider = user.providers[ii];
+        providers.push({
+          providerName: provider.providerName,
+          displayName: provider.name
+        });
       }
-    ]
-  }
-  io.to(req.sessionID).emit('auth_success', ltdUser);
+      io.to(user.sessid).emit('auth_success', providers);
+      next();
+    }
+  )(req, res, next);
+});
+
+router.get('/auth/google/callback', function(req, res, next) {
+  res.render('auth_complete');
+});
+
+router.get('/azure/:sessionID', function(req, res, next) {
+  passport.authenticate(
+    'azure', 
+    { state: req.params.sessionID },
+    function (err, user) {
+      var providers = [];
+      for (var ii = 0; ii < user.providers.length; ii++) {
+        var provider = user.providers[ii];
+        providers.push({
+          providerName: provider.providerName,
+          displayName: provider.name
+        });
+      }
+      io.to(user.sessid).emit('auth_success', providers);
+      next();
+    }
+  )(req, res, next);
+});
+
+router.get('/azure/callback', function(req, res, next) {
+  res.render('auth_complete');
 });
 
 router.get('/error', function (req, res) {

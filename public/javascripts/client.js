@@ -6,14 +6,13 @@ socket.on('init', function (data) {
 	console.log(data);
 });
 
-socket.on('auth_success', function (data) {
-	console.log('auth_success: ' + JSON.stringify(data));
+socket.on('auth_success', function (providers) {
+	console.log('auth_success: ' + JSON.stringify(providers));
 	// Show the 'connected' UI for the providers
 	// that the user has signed-in.
-	var provider;
-	for (var i = 0; i < data.providers.length; i++)  {
-		var providerName = data.providers[i].providerName;
-		var name = data.providers[i].name;
+	for (var ii = 0; ii < providers.length; ii++) {
+		var providerName = providers[ii].providerName;
+		var name = providers[ii].displayName;
 		$('#' + providerName + '_disconnected').css('display', 'none');
 		$('#' + providerName + '_connected').css('display', 'block');
 		$('#' + providerName + '_name').text('Name: ' + name);
