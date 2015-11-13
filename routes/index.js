@@ -7,6 +7,7 @@ router.get('/', function (req, res, next) {
   var user = req.user;
   var userState = {
     title: 'Express',
+    sessionID : req.sessionID,
     azure: false,
     google: false
   };
@@ -15,14 +16,14 @@ router.get('/', function (req, res, next) {
     assessUserState(userState, user);
     console.log(JSON.stringify(user));
     res.render('index', userState);
-    console.log("Requestor: [" + req.sessionID + "]");
+    console.log("Requestor: [" + userState.sessionID + "]");
   } else {
     console.log('no sessionfound');
-    dbHelper.getUser(req.sessionID, function (err, user) {
+    dbHelper.getUser(userState.sessionID, function (err, user) {
       req.user = user;
       assessUserState(userState, user);
       res.render('index', userState);
-      console.log("Requestor: [" + req.sessionID + "]");
+      console.log("Requestor: [" + userState.sessionID + "]");
     });
   }
 });
@@ -30,13 +31,17 @@ router.get('/', function (req, res, next) {
 function assessUserState(state, user) {
   if (user) {
     var azure = getServiceByName(user, 'azure');
+    var google = getServiceByName(user, 'google');
     if (azure) {
       state.azureName = azure.name;
     }
-    if (getServiceByName(user, 'azure') && isValid(user, 'azure')) {
+    if (azure && isValid(user, 'azure')) {
       state.azure = true;
-    } else if (getServiceByName(user, 'google') && isValid(user, 'google')) {
+    }
+    if (google) {
       state.google = true;
+      console.log('GoogleName: ' + google.name);
+      state.googleName = google.name;
     }
   }
 }
