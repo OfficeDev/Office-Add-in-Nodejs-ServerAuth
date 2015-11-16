@@ -1,7 +1,5 @@
 var nano = require('nano')('http://ServerAuthCouchDB.cloudapp.net:5984')
 	, dbName = "user-session"
-	, username = ''
-	, userpass = ''	
 	, db = nano.use(dbName);
 
 function DbHelper() { }
