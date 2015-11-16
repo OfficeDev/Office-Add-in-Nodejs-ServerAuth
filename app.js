@@ -8,7 +8,7 @@ var express = require('express')
 // bind it to socket.io
   , io = require('socket.io')(socketServer);
 
-socketServer.listen(3001);
+//socketServer.listen(3001);
 module.exports = io;
 
 var path = require('path')
