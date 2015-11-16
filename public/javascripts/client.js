@@ -1,4 +1,4 @@
-var socket = io.connect('https://localhost:3001', { secure: true });
+var socket = io.connect('https://serverauthnode.cloudapp.net:3001', { secure: true });
 console.log(document.cookie);
 
 // respond to the init event - this is for debugging

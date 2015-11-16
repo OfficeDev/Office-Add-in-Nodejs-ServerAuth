@@ -1,4 +1,4 @@
-var nano = require('nano')('http://ServerAuthCouchDB.cloudapp.net:5984')
+var nano = require('nano')('http://localhost:5984')
 	, dbName = "user-session"
 	, db = nano.use(dbName);
 
