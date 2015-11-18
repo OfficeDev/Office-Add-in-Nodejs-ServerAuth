@@ -19,7 +19,7 @@ function disconnectService(user, serviceName) {
   return user;
 }
 
-function getDisconectCompleteUrl(req, service) {
+function getDisconnectCompleteUrl(req, service) {
   return encodeURIComponent(req.protocol + '://' + req.get('host'), + service + '/complete');
 }
 
