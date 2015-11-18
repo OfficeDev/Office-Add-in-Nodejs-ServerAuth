@@ -48,12 +48,20 @@ router.get('/google/:sessionID', function (req, res) {
           + '?continue=https://appengine.google.com/_ah/logout?continue='
           + appUrl;
         res.redirect(logoutUrl);
-// TODO: Notify the socket that disconnect flow is done
       } else {
         console.log('Error updating document: ' + err);
       }
     });
   });
+});
+
+router.get('/azure/complete/:sessionID', function (req, res, next) {
+  var providers = [];
+  providers.push({
+      providerName: 'azure'
+  });
+  io.to(req.params.sessionID).emit('disconnect_complete', providers);
+  res.render('disconnect_complete');
 });
 
 router.get('/azure/:sessionID', function (req, res) {
@@ -66,7 +74,7 @@ router.get('/azure/:sessionID', function (req, res) {
     dbHelper.insertDoc(updatedUser, null, function(err, body) {
       if(body.ok) {
         // Get the full URL of root to send it to the logout endpoint
-        var appUrl =  getAppUrl(req);
+        var appUrl = getDisconnectCompleteUrl(req, 'azure', updatedUser.sessid);
         var logoutUrl = 
         'https://login.microsoftonline.com/common/oauth2/logout' + 
         '?post_logout_redirect_uri=' + appUrl; 
