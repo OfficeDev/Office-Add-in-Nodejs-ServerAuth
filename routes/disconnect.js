@@ -19,8 +19,8 @@ function disconnectService(user, serviceName) {
   return user;
 }
 
-function getAppUrl(req) {
-  return encodeURIComponent(req.protocol + '://' + req.get('host'));
+function getDisconectCompleteUrl(req, service) {
+  return encodeURIComponent(req.protocol + '://' + req.get('host'), + service + '/complete');
 }
 
 router.get('/google/:sessionID', function (req, res) {
@@ -33,16 +33,21 @@ router.get('/google/:sessionID', function (req, res) {
     dbHelper.insertDoc(updatedUser, null, function(err, body) {
       if(body.ok) {
         // Get the full URL of root to send it to the logout endpoint
-        var appUrl = getAppUrl(req);
+        var appUrl = getDisconnectCompleteUrl(req, 'google');
         var logoutUrl = 'https://www.google.com/accounts/Logout'
           + '?continue=https://appengine.google.com/_ah/logout?continue='
           + appUrl;
         res.redirect(logoutUrl);
+// TODO: Notify the socket that disconnect flow is done
       } else {
         console.log('Error updating document: ' + err);
       }
     });
   });
+});
+
+router.get('/google/complete', function (req, res) {
+  res.render('disconnect_complete');
 });
 
 router.get('/azure/:sessionID', function (req, res) {
