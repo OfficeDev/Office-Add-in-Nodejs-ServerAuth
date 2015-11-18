@@ -20,7 +20,7 @@ function disconnectService(user, serviceName) {
 }
 
 function getDisconnectCompleteUrl(req, service) {
-  return encodeURIComponent(req.protocol + '://' + req.get('host'), + service + '/complete');
+  return encodeURIComponent(req.protocol + '://' + req.get('host'), + '/disconnect/' + service + '/complete');
 }
 
 router.get('/google/:sessionID', function (req, res) {
@@ -46,7 +46,7 @@ router.get('/google/:sessionID', function (req, res) {
   });
 });
 
-router.get('/google/complete', function (req, res) {
+router.get('/google/complete', function (req, res, next) {
   res.render('disconnect_complete');
 });
 
