@@ -1,8 +1,12 @@
 body {
-  padding: 50px;
+  padding: 20px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+.ms-ListItem-primaryText {
+  padding-right : 0px;
 }
