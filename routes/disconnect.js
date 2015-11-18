@@ -19,12 +19,16 @@ function disconnectService(user, serviceName) {
   return user;
 }
 
-function getDisconnectCompleteUrl(req, service) {
-  return encodeURIComponent(req.protocol + '://' + req.get('host') + '/disconnect/' + service + '/complete');
+function getDisconnectCompleteUrl(req, service, sessionID) {
+  return encodeURIComponent(req.protocol + '://' + req.get('host') + '/disconnect/' + service + '/complete/' + sessionID);
 }
 
-router.get('/google/complete', function (req, res, next) {
-  console.log('Actually got to disconnect/google/complete');
+router.get('/google/complete/:sessionID', function (req, res, next) {
+  var providers = [];
+  providers.push({
+      providerName: 'google'
+  });
+  io.to(req.params.sessionID).emit('disconnect_complete', providers);
   res.render('disconnect_complete');
 });
 
@@ -38,7 +42,7 @@ router.get('/google/:sessionID', function (req, res) {
     dbHelper.insertDoc(updatedUser, null, function(err, body) {
       if(body.ok) {
         // Get the full URL of root to send it to the logout endpoint
-        var appUrl = getDisconnectCompleteUrl(req, 'google');
+        var appUrl = getDisconnectCompleteUrl(req, 'google', updatedUser.sessid);
           console.log('Disconnect URL: ' + appUrl);
         var logoutUrl = 'https://www.google.com/accounts/Logout'
           + '?continue=https://appengine.google.com/_ah/logout?continue='

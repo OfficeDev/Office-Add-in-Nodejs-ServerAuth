@@ -20,6 +20,18 @@ socket.on('auth_success', function (providers) {
 	}
 });
 
+socket.on('disconnect_complete', function (providers) {
+	console.log('disconnect_complete: ' + JSON.stringify(providers));
+	// Show the 'disconnected' UI for the providers
+	// that the user has signed-in.
+	for (var ii = 0; ii < providers.length; ii++) {
+		var providerName = providers[ii].providerName;
+		$('#' + providerName + '_disconnected').css('display', 'block');
+		$('#' + providerName + '_connected').css('display', 'none');
+		setSelection(providerName + ' disconnected');
+	}
+});
+
 (function () {
     "use strict";
 
