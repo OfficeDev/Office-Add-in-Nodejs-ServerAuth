@@ -2,18 +2,15 @@
 
 [![Build Status](https://travis-ci.org/OfficeDev/Office-Add-in-NodeJS-ServerAuth.svg?branch=master)](https://travis-ci.org/OfficeDev/Office-Add-in-NodeJS-ServerAuth)
 
-Connecting to Office 365 is the first step every app must take to start working with Office 365 services and data. This sample shows how to connect and then call one API through Microsoft Graph (previously called Office 365 unified API), and uses the Office Fabric UI to create an Office 365 experience.
+An important part of building an Office add-in is to improve productivity of your users. You can leverage 3rd party services in your add-ins to improve user productivity. However, Office add-ins can be used in most versions of Office, including native applications and online versions across multiple platforms. This sample shows how to incorporate 3rd party services that are compliant with the OAUth 2.0 specification by using server-side technologies.
 
-Try out the [Get started with Office 365 APIs](http://dev.office.com/getting-started/office365apis?platform=option-php#setup) page which simplifies registration so you can get this sample running faster.
+![Office Add-in Server Authentication Sample screenshot](/readme-images/Office-Add-in-NodeJS-ServerAuth.png)
 
-![Office 365 PHP Connect sample screenshot](/readme-images/O365-PHP-Microsoft-Graph-Connect.png)
-
-> Note: For an in-depth look at the code, see [Understanding Connect code sample] (https://github.com/OfficeDev/O365-PHP-Microsoft-Graph-Connect/wiki/Understanding-Connect-code-sample).
-
+[//]: # "> **Note:** Link here to Reeza's article."
 
 ## Prerequisites
 
-To use the Office 365 PHP Connect sample, you need the following:
+To use the Office Add-in Server Authentication sample, you need the following:
 
 * [PHP](http://php.net/) is required to run the sample on a development server. The instructions in this sample use the PHP 5.4 built-in web server. However, the sample has also been tested on Internet Information Services and Apache Server.
 	* Client URL (cURL) module. The web application uses cURL to issue requests to REST endpoints. 
