@@ -10,15 +10,22 @@ However, you must keep in mind that Office add-ins run in a variety of platforms
 
 Some versions of Office use an iframe to display the add-in. This poses an inconvenience for OAuth flows. The authentication flow in OAuth uses a sign-in page that can't be displayed in an iframe. The reason behind this is to minimize the risk that a malicious page takes control of the sign-in page. Your add-in should not try to display the OAuth sign-in page in the main add-in window.
 
-**Solution:** Start the OAuth flow in a pop-up page.
+**Solution:** Start the OAuth flow from a pop-up page.
 
-Some browsers, most notably Internet Explorer, have the concept of security zones. If pages are in different security zones, you'll have a hard time trying to make them talk to each other. This might be the case of your pop-up and main add-in pages.
+After the OAuth flow is done, you might want to pass the tokens to your main add-in page and use them to make API calls to the 3rd party service. 
+Some browsers, most notably Internet Explorer, have the concept of security zones. If pages are in different security zones, you'll have some difficulty trying to make them talk to each other. This might be the case of your pop-up and main add-in pages.
 
-* The second consideration is pop-up and main add-in page communication. Some browsers, most notably Internet Explorer, have the concept of security zones. This means that they can't share cookies, JavaScript calls or other means of communication or shared data.
+**Solution:** Store the tokens in a database and make the API calls from your server instead. Enable server-side communication via sockets to communicate the results. There are many libraries that make it easy to communicate between the server and the pages. This sample uses [Socket.io](http://socket.io) to notify the main add-in page that the OAuth flow is done.
 
-* Because of the communication challenges mentioned in the previous point, we can't be completely sure that the pop-up and the main add-in page share the same session. This poses a challenge when trying to  
+Because of the security zones mentioned previously, we can't be completely sure that the pop-up and the main add-in page share the same session identifier in your add-in. If this is the case, the add-in server doesn't have a way to determine what main add-in page it needs to notify.
 
-* SInce the OAuth flow happens outside of your pages, it is hard for the main page to know when the OAuth flow is done. Notify the main add-in page that the OAuth flow has finished.
+**Solution:** Use the main page session identifier to identify the browser session, whether it is the pop-up or the main add-in page. If you have to open a pop-up send the session identifier as part of the path or query string.
+
+The OAuth flow is also affected by the security zones. If your add-in can't reliably identify the browser session where the OAuth flow returned you'll have problems deciding to what browser session owns the tokens.
+
+**Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
+
+    > Note: The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect\_uri parameter with the redirect\_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect\_uri. 
 
 add-ins can be used in most versions of Office, including native applications and online versions across multiple platforms. This sample shows how to incorporate 3rd party services that are compliant with the OAUth 2.0 specification by using server-side technologies.
 
