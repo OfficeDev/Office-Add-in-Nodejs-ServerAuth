@@ -2,7 +2,25 @@
 
 [![Build Status](https://travis-ci.org/OfficeDev/Office-Add-in-NodeJS-ServerAuth.svg?branch=master)](https://travis-ci.org/OfficeDev/Office-Add-in-NodeJS-ServerAuth)
 
-An important part of building an Office add-in is to improve productivity of your users. You can leverage 3rd party services in your add-ins to improve user productivity. However, Office add-ins can be used in most versions of Office, including native applications and online versions across multiple platforms. This sample shows how to incorporate 3rd party services that are compliant with the OAUth 2.0 specification by using server-side technologies.
+A goal of many Office add-in is to improve user productivity, you can get closer to achieve this goal with the help of 3rd party services. Most of today services implement the OAuth 2.0 specification to allow other applications into the user data. Your add-in could be one of these applications.
+
+However, you must keep in mind that Office add-ins run in a variety of platforms and devices. This presents a great opportunity for your add-in, but you must be aware of the following considerations when you try to make OAuth flows work across a combination of platforms and technologies.
+
+## Considerations
+
+Some versions of Office use an iframe to display the add-in. This poses an inconvenience for OAuth flows. The authentication flow in OAuth uses a sign-in page that can't be displayed in an iframe. The reason behind this is to minimize the risk that a malicious page takes control of the sign-in page. Your add-in should not try to display the OAuth sign-in page in the main add-in window.
+
+**Solution:** Start the OAuth flow in a pop-up page.
+
+Some browsers, most notably Internet Explorer, have the concept of security zones. If pages are in different security zones, you'll have a hard time trying to make them talk to each other. This might be the case of your pop-up and main add-in pages.
+
+* The second consideration is pop-up and main add-in page communication. Some browsers, most notably Internet Explorer, have the concept of security zones. This means that they can't share cookies, JavaScript calls or other means of communication or shared data.
+
+* Because of the communication challenges mentioned in the previous point, we can't be completely sure that the pop-up and the main add-in page share the same session. This poses a challenge when trying to  
+
+* SInce the OAuth flow happens outside of your pages, it is hard for the main page to know when the OAuth flow is done. Notify the main add-in page that the OAuth flow has finished.
+
+add-ins can be used in most versions of Office, including native applications and online versions across multiple platforms. This sample shows how to incorporate 3rd party services that are compliant with the OAUth 2.0 specification by using server-side technologies.
 
 ![Office Add-in Server Authentication Sample screenshot](/readme-images/Office-Add-in-NodeJS-ServerAuth.png)
 
