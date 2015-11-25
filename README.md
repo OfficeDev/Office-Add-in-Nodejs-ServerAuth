@@ -4,6 +4,10 @@
 
 A goal of many Office add-in is to improve user productivity, you can get closer to achieve this goal with the help of 3rd party services. Most of today services implement the OAuth 2.0 specification to allow other applications into the user data. Your add-in could be one of these applications.
 
+![Office Add-in Server Authentication Sample screenshot](/readme-images/Office-Add-in-NodeJS-ServerAuth.png)
+
+[//]: # "> **Note:** Link here to Reeza's article."
+
 However, you must keep in mind that Office add-ins run in a variety of platforms and devices. This presents a great opportunity for your add-in, but you must be aware of the following considerations when you try to make OAuth flows work across a combination of platforms and technologies.
 
 ## Considerations
@@ -26,12 +30,6 @@ The OAuth flow is also affected by the security zones. If your add-in can't reli
 **Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
 
     > Note: The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect\_uri parameter with the redirect\_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect\_uri. 
-
-add-ins can be used in most versions of Office, including native applications and online versions across multiple platforms. This sample shows how to incorporate 3rd party services that are compliant with the OAUth 2.0 specification by using server-side technologies.
-
-![Office Add-in Server Authentication Sample screenshot](/readme-images/Office-Add-in-NodeJS-ServerAuth.png)
-
-[//]: # "> **Note:** Link here to Reeza's article."
 
 ## Prerequisites
 
