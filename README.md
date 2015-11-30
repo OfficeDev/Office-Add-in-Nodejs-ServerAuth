@@ -21,45 +21,47 @@ Some browsers, most notably Internet Explorer, have the concept of security zone
 
 **Solution:** Store the tokens in a database and make the API calls from your server instead. Enable server-side communication via sockets to communicate the results. There are many libraries that make it easy to communicate between the server and the pages. This sample uses [Socket.io](http://socket.io) to notify the main add-in page that the OAuth flow is done.
 
-Because of the security zones mentioned previously, we can't be completely sure that the pop-up and the main add-in page share the same session identifier in your add-in. If this is the case, the add-in server doesn't have a way to determine what main add-in page it needs to notify.
+Because of the security zones mentioned previously, we can't be sure that the pop-up and the main add-in page share the same session identifier in your add-in. If this is the case, the add-in server doesn't have a way to determine what main add-in page it needs to notify.
 
 **Solution:** Use the main page session identifier to identify the browser session, whether it is the pop-up or the main add-in page. If you have to open a pop-up send the session identifier as part of the path or query string.
 
-The OAuth flow is also affected by the security zones. If your add-in can't reliably identify the browser session where the OAuth flow returned you'll have problems deciding to what browser session owns the tokens.
+The OAuth flow is also affected by security zones. If your add-in can't reliably identify the browser session where the OAuth flow returned you'll have problems deciding to what browser session owns the tokens.
 
 **Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
 
     > Note: The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect\_uri parameter with the redirect\_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect\_uri. 
 
+As an additional security measure, this sample deletes tokens from the database after two minutes. You should implement token storage policies according to your application requirements.
+
 ## Prerequisites
 
 To use the Office Add-in Server Authentication sample, you need the following:
 
-* [PHP](http://php.net/) is required to run the sample on a development server. The instructions in this sample use the PHP 5.4 built-in web server. However, the sample has also been tested on Internet Information Services and Apache Server.
-	* Client URL (cURL) module. The web application uses cURL to issue requests to REST endpoints. 
-* An Office 365 account. You can sign up for [an Office 365 Developer subscription](https://portal.office.com/Signup/Signup.aspx?OfferId=6881A1CB-F4EB-4db3-9F18-388898DAF510&DL=DEVELOPERPACK&ali=1#0) that includes the resources that you need to start building Office 365 apps.
+* [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
+* [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
+* The dependencies require Python version 2.7.0 and XCode version 6.3.2 or greater (Mac) or Visual Studio Express 2015 with C++ features installed (Windows).
+* A Microsoft Azure tenant or Google developer account to register your application. Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization. You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) or a [Google account](https://console.developers.google.com/).
+* A [```client ID```](app/Constants.php#L29), and [```secret``](app/Constants.php#L30) values of an application registered in Azure and/or Google.
 
      > **Note:** <br />
-     If you already have a subscription, the previous link sends you to a page with the message *Sorry, you can’t add that to your current account*. In that case use an account from your current Office 365 subscription.<br /><br />
-     If you are already signed-in to Office 365, the Sign-in button in the previous link shows the message *Sorry, we can't process your request*. In that case sign-out from Office 365 in that same page and sign-in again.
-* A Microsoft Azure tenant to register your application. Azure Active Directory (AD) provides identity services that applications use for authentication and authorization. A trial subscription can be acquired here: [Microsoft Azure](https://account.windowsazure.com/SignUp).
+     During the app registration process, make sure to specify **https://localhost:3000/connect/azure/callback** or **https://localhost:3000/connect/google.callback** as the **redirect URL**.
 
-     > **Important:** <br />
-     You also need to make sure your Azure subscription is bound to your Office 365 tenant. To do this, see the Active Directory team's blog post, [Creating and Managing Multiple Windows Azure Active Directories](http://blogs.technet.com/b/ad/archive/2013/11/08/creating-and-managing-multiple-windows-azure-active-directories.aspx). The section **Adding a new directory** will explain how to do this. You can also see [Set up your Office 365 development environment](https://msdn.microsoft.com/office/office365/howto/setup-development-environment#bk_CreateAzureSubscription) and the section **Associate your Office 365 account with Azure AD to create and manage apps** for more information.
-* A [```client ID```](app/Constants.php#L29), and [```key```](app/Constants.php#L30) values of an application registered in Azure. This sample application must be granted the **Send mail as a user** permission for the **Microsoft Graph**. For details see [Register your web server app with the Azure Management Portal](https://msdn.microsoft.com/office/office365/HowTo/add-common-consent-manually#bk_RegisterServerApp) and [grant proper permissions to the Connect application](https://github.com/OfficeDev/O365-PHP-Microsoft-Graph-Connect/wiki/Grant-permissions-to-the-Connect-application-in-Azure).
+## Configure the add-in
 
-     > **Note:** <br />
-     During the app registration process, make sure to specify **http://localhost:8000/callback.php** as the **Sign-on URL**.
+See [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx) to install the add-in to your Office desktop applications or [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx) if you want to install the add-in to your organization's add-ins.
 
 ## Configure and run the app
 
-1. Map a web application in your web server to the **app** folder in your local repository. 
-2. Using your favorite IDE, open **Constants.php** in the *app* folder.
-3. Replace *ENTER_YOUR_CLIENT_ID* with the client ID of your registered Azure application.
-4. Replace *ENTER_YOUR_SECRET* with the client secret of your registered Azure application.
-5. Start the built-in web server with the following command:
+1. Using your favorite text editor, open **ws-conf.js**.
+2. Replace *ENTER_YOUR_CLIENT_ID* with the client ID of your registered Azure or Google application.
+3. Replace *ENTER_YOUR_SECRET* with the client secret of your registered Azure or Google application.
+4. Install the dependencies running the following command:
     ```
-    php -S 0.0.0.0:8000 -t app
+    npm install
+    ```
+5. Start the application with the following command:
+    ```
+    npm start
     ```
     
 6. Navigate to ```http://localhost:8000``` in your web browser.
