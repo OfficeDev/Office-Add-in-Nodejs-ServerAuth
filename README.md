@@ -29,7 +29,7 @@ Your add-in must reliably identify the browser session that started the OAuth fl
 
 > **Note:** <br /> The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect_uri parameter with the redirect_uri value registered by the client. For this reason, you shouldn't attach query string parameters or additional path elements to the redirect_uri. 
 
-As an additional security measure, this sample deletes tokens from the database after two minutes. You should implement token storage policies according to your application requirements.
+As an additional security measure, this sample deletes tokens from the database after two minutes of requesting them. You should implement token storage policies according to your application requirements.
 
 ## Prerequisites
 
