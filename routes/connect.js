@@ -22,7 +22,7 @@ io.on('connection', function (socket) {
   io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
 
-router.get('/auth/google/:sessionID', function(req, res, next) {
+router.get('/google/:sessionID', function(req, res, next) {
   passport.authenticate('google', 
     { 
       scope: 'profile', 
@@ -44,7 +44,7 @@ router.get('/auth/google/:sessionID', function(req, res, next) {
   )(req, res, next);
 });
 
-router.get('/auth/google/callback', function(req, res, next) {
+router.get('/google/callback', function(req, res, next) {
   res.render('auth_complete');
 });
 
