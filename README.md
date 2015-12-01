@@ -6,8 +6,6 @@ A goal of many Office add-in is to improve user productivity, you can get closer
 
 ![Office Add-in Server Authentication Sample screenshot](/readme-images/Office-Add-in-NodeJS-ServerAuth.png)
 
-[//]: # "> **Note:** Link here to Reeza's article."
-
 However, you must keep in mind that Office add-ins run in a variety of platforms and devices. This presents a great opportunity for your add-in, but you must be aware of the following considerations when you try to make OAuth flows work across a combination of platforms and technologies.
 
 ## Design considerations
@@ -23,13 +21,13 @@ Some browsers, most notably Internet Explorer, have the concept of security zone
 
 Because of the security zones mentioned previously, we can't be sure that the pop-up and the main add-in page share the same session identifier in your add-in. If this is the case, the add-in server doesn't have a way to determine what main add-in page it needs to notify.
 
-**Solution:** Use the main page session identifier to identify the browser session, whether it is the pop-up or the main add-in page. If you have to open a pop-up send the session identifier as part of the path or query string.
+**Solution:** Use the main page session id to identify the browser session, whether it is the pop-up or the main add-in page id. If you have to open a pop-up, send the session identifier as part of the path or query string.
 
 The OAuth flow is also affected by security zones. If your add-in can't reliably identify the browser session where the OAuth flow returned you'll have problems deciding to what browser session owns the tokens.
 
 **Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
 
-> **Note:** <br /> The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect_uri parameter with the redirect_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect_uri. 
+> **Note:** <br /> The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect_uri parameter with the redirect_uri value registered by the client. For this reason, you shouldn't attach query string parameters or additional path elements to the redirect_uri. 
 
 As an additional security measure, this sample deletes tokens from the database after two minutes. You should implement token storage policies according to your application requirements.
 
