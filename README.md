@@ -39,7 +39,7 @@ To use the Office Add-in Server Authentication sample, you need the following:
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
 * The dependencies require Python version 2.7 and XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with C++ features installed (Windows).
 * App registration in Azure and/or Google services. Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization.
-    * You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) to register your app. The sample requires the **Windows Azure Active Directory** > **Sign in and read user profile** delegated permission, which is assigned by default. Add **https://localhost:3000/connect/azure/callback** to the list of reply URLs.
+    * You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) to register your app. The sample requires the **Microsoft Graph** > **Sign in and read user profile** delegated permission. Add **https://localhost:3000/connect/azure/callback** to the list of reply URLs.
     * You can register your app in [Google Developers Console](https://console.developers.google.com/). The sample requires the **Google+ API** to be enabled. Add **https://localhost:3000/connect/google/callback** to the list of authorized redirect URIs.
 * A ```client ID``` and ```secret``` values of an application registered in Azure and/or Google.
 
