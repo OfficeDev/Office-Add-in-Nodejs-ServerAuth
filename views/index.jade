@@ -2,7 +2,7 @@ extends layout
 
 block content
   h1.ms-font-xxl Welcome
-  p.ms-font-l The AuthServer sample shows how to conect to third party services that adhere to the OAuth 2.0 specification.
+  p.ms-font-l The AuthServer sample shows how to connect to third party services that adhere to the OAuth 2.0 specification.
   p.ms-font-l Click the services below to start the authentication flow with each of the services.
   
   div(class='ms-List')
@@ -28,7 +28,7 @@ block content
       div(
         class='ms-ListItem-primaryText ms-Link',
         title='Connect to Google',
-        onclick="window.open('/connect/auth/google/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Google
+        onclick="window.open('/connect/google/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Google
       span(class='ms-ListItem-secondaryText') Status: Disconnected
 
     div#google_connected(style=(google ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
