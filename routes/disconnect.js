@@ -45,7 +45,7 @@ router.get('/google/:sessionID', function (req, res) {
     
     // Remove the azure provider from the document
     dbHelper.insertDoc(updatedUser, null, function(err, body) {
-      if(body.ok) {
+      if(!err) {
         // Get the full URL of root to send it to the logout endpoint
         var appUrl = getDisconnectCompleteUrl(req, 'google', updatedUser.sessid);
           console.log('Disconnect URL: ' + appUrl);
@@ -53,8 +53,13 @@ router.get('/google/:sessionID', function (req, res) {
           + '?continue=https://appengine.google.com/_ah/logout?continue='
           + appUrl;
         res.redirect(logoutUrl);
+      } else if (err.message === 'Document update conflict.') {
+        console.log('Retry one more time');
+        dbHelper.getUser(req.params.sessionID, function (err, newUser) {
+          dbHelper.insertDoc(disconnectService(newUser, 'google'), null, function(err, newUser){});
+        });
       } else {
-        console.log('Error updating document: ' + err);
+        console.log('Error updating document: ' + err.message);
       }
     });
   });
@@ -77,13 +82,18 @@ router.get('/azure/:sessionID', function (req, res) {
     
     // Remove the azure provider from the document
     dbHelper.insertDoc(updatedUser, null, function(err, body) {
-      if(body.ok) {
+      if(!err) {
         // Get the full URL of root to send it to the logout endpoint
         var appUrl = getDisconnectCompleteUrl(req, 'azure', updatedUser.sessid);
         var logoutUrl = 
         'https://login.microsoftonline.com/common/oauth2/logout' + 
         '?post_logout_redirect_uri=' + appUrl; 
         res.redirect(logoutUrl);
+      } else if (err.message === 'Document update conflict.') {
+        console.log('Retry one more time');
+        dbHelper.getUser(req.params.sessionID, function (err, newUser) {
+          dbHelper.insertDoc(disconnectService(newUser, 'azure'), null, function(err, newUser){});
+        });
       } else {
         console.log('Error updating document: ' + err);
       }
