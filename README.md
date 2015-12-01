@@ -56,6 +56,7 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     ```
     npm install
     ```
+
 5. Start the application with the following command:
     ```
     npm start
