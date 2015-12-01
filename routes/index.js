@@ -39,30 +39,13 @@ function assessUserState(state, user) {
     var google = getServiceByName(user, 'google');
     if (azure) {
       state.azureName = azure.name;
-    }
-    if (azure && isValid(user, 'azure')) {
       state.azure = true;
     }
     if (google) {
       state.google = true;
-      console.log('GoogleName: ' + google.name);
       state.googleName = google.name;
     }
   }
-}
-
-function isValid(user, service) {
-  var provider = getServiceByName(user, service);
-  console.log("Found service - " + JSON.stringify(provider));
-  var currentTimeSeconds = Math.round(new Date().getTime() / 1000);
-  if (currentTimeSeconds < provider.accessTokenExpiry) {
-    console.log('token: valid');
-    return true;
-  } else {
-    console.error('token: expired');
-    dbHelper.deleteUser(user);
-  }
-  return false;
 }
 
 function getServiceByName(user, serviceName) {

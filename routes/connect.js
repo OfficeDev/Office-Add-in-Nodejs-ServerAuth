@@ -40,7 +40,8 @@ router.get('/google/:sessionID', function(req, res, next) {
         var provider = user.providers[ii];
         providers.push({
           providerName: provider.providerName,
-          displayName: provider.name
+          displayName: provider.name,
+          sessionID: user.sessid
         });
       }
       io.to(user.sessid).emit('auth_success', providers);
@@ -63,7 +64,8 @@ router.get('/azure/:sessionID', function(req, res, next) {
         var provider = user.providers[ii];
         providers.push({
           providerName: provider.providerName,
-          displayName: provider.name
+          displayName: provider.name,
+          sessionID: user.sessid
         });
       }
       io.to(user.sessid).emit('auth_success', providers);
