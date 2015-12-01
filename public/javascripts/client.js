@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 var socket = io.connect('https://localhost:3001', { secure: true });
 console.log(document.cookie);
 

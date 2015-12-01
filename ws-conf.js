@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 exports.azureConf = {
     authorizationURL: 'https://login.microsoftonline.com/common/oauth2/authorize',
     tokenURL: 'https://login.microsoftonline.com/common/oauth2/token',

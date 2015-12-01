@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 var express = require('express')
   , router = express.Router()
   , passport = require('passport')
@@ -72,7 +77,6 @@ router.get('/azure/callback', function(req, res, next) {
 });
 
 router.get('/error', function (req, res) {
-  // TODO prompt them to report an issue on Github
   res.status(500);
   res.send('An unexpected error was encountered.');
 });

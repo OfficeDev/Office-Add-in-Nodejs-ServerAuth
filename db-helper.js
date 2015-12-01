@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 var nano = require('nano')('http://localhost:5984')
 	, dbName = "user-session"
 	, db = nano.use(dbName);
@@ -14,8 +19,6 @@ DbHelper.prototype.destroy = function destroy(callback) {
 
 DbHelper.prototype.getUser = function getUser(sessid, callback) {
 	console.log('user session: ' + sessid);
-	// For production instances, use a view
-	// https://wiki.apache.org/couchdb/HTTP_view_API
 
 	// open the view
 	db.view('user-sessions', 'by_sessionID', {
