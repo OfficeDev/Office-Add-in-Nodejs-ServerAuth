@@ -29,7 +29,7 @@ The OAuth flow is also affected by security zones. If your add-in can't reliably
 
 **Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
 
-    > Note: The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect_uri parameter with the redirect_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect_uri. 
+> Note: The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect_uri parameter with the redirect_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect_uri. 
 
 As an additional security measure, this sample deletes tokens from the database after two minutes. You should implement token storage policies according to your application requirements.
 
