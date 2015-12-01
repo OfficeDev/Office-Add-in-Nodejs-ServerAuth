@@ -43,7 +43,7 @@ To use the Office Add-in Server Authentication sample, you need the following:
     * You can register your app in [Google Developers Console](https://console.developers.google.com/). The sample requires the Google+ API. Add **https://localhost:3000/connect/google/callback** to the list of authorized redirect URIs.
 * A [```client ID```](app/Constants.php#L29) and [```secret```](app/Constants.php#L30) values of an application registered in Azure and/or Google.
 
-## Configure the add-in
+## Deploy the add-in
 
 See [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx) to install the add-in to your Office desktop applications or [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx) if you want to install the add-in to your organization's add-in catalog.
 
