@@ -10,7 +10,7 @@ A goal of many Office add-in is to improve user productivity, you can get closer
 
 However, you must keep in mind that Office add-ins run in a variety of platforms and devices. This presents a great opportunity for your add-in, but you must be aware of the following considerations when you try to make OAuth flows work across a combination of platforms and technologies.
 
-## Considerations
+## Design considerations
 
 Some versions of Office use an iframe to display the add-in. This poses an inconvenience for OAuth flows. The authentication flow in OAuth uses a sign-in page that can't be displayed in an iframe. The reason behind this is to minimize the risk that a malicious page takes control of the sign-in page. Your add-in should not try to display the OAuth sign-in page in the main add-in window.
 
@@ -29,7 +29,7 @@ The OAuth flow is also affected by security zones. If your add-in can't reliably
 
 **Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
 
-    > Note: The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect\_uri parameter with the redirect\_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect\_uri. 
+    > Note: The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect_uri parameter with the redirect_uri value registered by the client. For this reason, you shouldn't use query string parameters or additional path elements to the redirect_uri. 
 
 As an additional security measure, this sample deletes tokens from the database after two minutes. You should implement token storage policies according to your application requirements.
 
@@ -39,16 +39,18 @@ To use the Office Add-in Server Authentication sample, you need the following:
 
 * [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
-* The dependencies require Python version 2.7.0 and XCode version 6.3.2 or greater (Mac) or Visual Studio Express 2015 with C++ features installed (Windows).
-* A Microsoft Azure tenant or Google developer account to register your application. Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization. You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) or a [Google account](https://console.developers.google.com/).
+* The dependencies require Python version 2.7 and XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with C++ features installed (Windows).
+* App registration in Azure and/or Google services. Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization.
+    * You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) to register your app. The sample requires the **Windows Azure Active Directory** > **Sign in and read user profile delegated permission**, which is assigned by default.
+    * You can register your app in [Google Developers Console](https://console.developers.google.com/). The sample requires the Google+ API.
 * A [```client ID```](app/Constants.php#L29), and [```secret``](app/Constants.php#L30) values of an application registered in Azure and/or Google.
 
      > **Note:** <br />
-     During the app registration process, make sure to specify **https://localhost:3000/connect/azure/callback** or **https://localhost:3000/connect/google.callback** as the **redirect URL**.
+     During the app registration process, make sure to specify **https://localhost:3000/connect/azure/callback** or **https://localhost:3000/connect/google/callback** as the **redirect URL**.
 
 ## Configure the add-in
 
-See [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx) to install the add-in to your Office desktop applications or [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx) if you want to install the add-in to your organization's add-ins.
+See [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx) to install the add-in to your Office desktop applications or [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx) if you want to install the add-in to your organization's add-in catalog.
 
 ## Configure and run the app
 
@@ -63,41 +65,24 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     ```
     npm start
     ```
-    
-6. Navigate to ```http://localhost:8000``` in your web browser.
 
-## Troubleshooting
-
-### Error: Unable to get local issuer certificate
-
-You receive the following error after providing your credentials to the sign in page.
-```
-SSL certificate problem: unable to get local issuer certificate
-```
-
-cURL can't verify the validity of the Microsoft certificate when trying to issue a request call to get tokens. You must configure cURL to use a certificate when issuing https requests by following these steps:  
-
-1. Download the cacert.pem file from [cURL website](http://curl.haxx.se/docs/caextract.html). 
-2. Open your php.ini file and add the following line
-
-	```
-	curl.cainfo = "path_to_cacert/cacert.pem"
-	```
+    > **Note:** <br />
+    The sample uses a self-signed certificate to serve the site using the https protocol. The sample requires you to trust the certificate to run properly. You can also generate your own self-signed certificate using the **ss_certgen.sh** script, which requires [OpenSSL](http://www.openssl.org/) to run.
+6. Open Word or Excel and click **Insert** > **My add-ins** > **See all...**    
+7. Click **Shared Folder** if you deployed the add-in to a network share or **My Organization** if you deployed the add-in to the add-in catalog.
+8. Click **ServerAuth Sample**.
 
 ## Questions and comments
 
-We'd love to get your feedback about the Office 365 PHP Connect sample. You can send your questions and suggestions to us in the [Issues](https://github.com/OfficeDev/O365-PHP-Microsoft-Graph-Connect/issues) section of this repository.
+We'd love to get your feedback about this sample. You can send your questions and suggestions to us in the [Issues](https://github.com/OfficeDev/Office-Add-in-NodeJS-ServerAuth/issues) section of this repository.
 
-Questions about Office 365 development in general should be posted to [Stack Overflow](http://stackoverflow.com/questions/tagged/Office365+API). Make sure that your questions or comments are tagged with [Office365] and [API].
+Questions about Office 365 development in general should be posted to [Stack Overflow](http://stackoverflow.com/questions/tagged/office-addins). Make sure that your questions or comments are tagged with [office-addins].
   
 ## Additional resources
 
-* [Office 365 APIs platform overview](https://msdn.microsoft.com/office/office365/howto/platform-development-overview)
-* [Getting started with Office 365 APIs](http://dev.office.com/getting-started/office365apis)
-* [Overview of Microsoft Graph](http://graph.microsoft.io/)
-* [Other Microsoft Graph Connect samples](https://github.com/officedev?utf8=%E2%9C%93&query=Microsoft-Graph-Connect)
-* [Office 365 APIs starter projects and code samples](https://msdn.microsoft.com/office/office365/howto/starter-projects-and-code-samples)
-* [Office UI Fabric](https://github.com/OfficeDev/Office-UI-Fabric)
+* [More Add-in samples](https://github.com/OfficeDev?utf8=%E2%9C%93&query=-Add-in)
+* [Office Add-ins](http://msdn.microsoft.com/library/office/jj220060.aspx)
+* [Anatomy of an Add-in](https://msdn.microsoft.com/library/office/jj220082.aspx#StartBuildingApps_AnatomyofApp)
 
 ## Copyright
 Copyright (c) 2015 Microsoft. All rights reserved.
