@@ -49,7 +49,7 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
 
 ## Configure and run the app
 
-1. Using your favorite text editor, open **ws-conf.js**.
+1. Use a text editor to open ```ws-conf.js```.
 2. Replace *ENTER_YOUR_CLIENT_ID* with the client ID of your registered Azure or Google application.
 3. Replace *ENTER_YOUR_SECRET* with the client secret of your registered Azure or Google application.
 4. Install the dependencies running the following command:
