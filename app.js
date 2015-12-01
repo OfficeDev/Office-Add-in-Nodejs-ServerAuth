@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 var express = require('express')
   , app = express()
 // load up the certificates
@@ -106,7 +111,6 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
           if (!err) {
             console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
           }
-          // TODO should this really be null? Or should be the err instance?
           done(null, userData);
         });
     });
@@ -143,7 +147,6 @@ app.use('/connect', connect);
 app.use('/disconnect', disconnect);
 
 passport.serializeUser(function (user, done) {
-  // keep those sessions light!
   done(null, user.sessid);
 });
 
@@ -183,6 +186,5 @@ app.use(function (err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 var express = require('express')
   , router = express.Router()
   , dbHelper = new (require('../db-helper'))();
@@ -46,7 +51,6 @@ function assessUserState(state, user) {
   }
 }
 
-// TODO method stub
 function isValid(user, service) {
   var provider = getServiceByName(user, service);
   console.log("Found service - " + JSON.stringify(provider));
