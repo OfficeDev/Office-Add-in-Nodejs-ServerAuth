@@ -4,6 +4,8 @@
  */
 
 var socket = io.connect('https://localhost:3001', { secure: true });
+// The token will only live in our database for 2 minutes
+var tokenLifetime = 120000;
 console.log(document.cookie);
 
 // respond to the init event - this is for debugging
@@ -18,10 +20,14 @@ socket.on('auth_success', function (providers) {
 	for (var ii = 0; ii < providers.length; ii++) {
 		var providerName = providers[ii].providerName;
 		var name = providers[ii].displayName;
+		var sessionID = providers[ii].sessionID;
 		$('#' + providerName + '_disconnected').css('display', 'none');
 		$('#' + providerName + '_connected').css('display', 'block');
 		$('#' + providerName + '_name').text('Name: ' + name);
 		setSelection(providerName + ' connected \nUser: ' + name);
+		
+		// Initiate the disconnect flow when the token lifetime comes to an end.
+		setTimeout("silentDisconnect('" + sessionID + "', '" + providerName + "')", tokenLifetime);
 	}
 });
 
@@ -51,4 +57,10 @@ socket.on('disconnect_complete', function (providers) {
 // Writes data to the current document selection
 function setSelection(data) {
 	Office.context.document.setSelectedDataAsync(data);
+}
+
+function silentDisconnect(sessionID, providerName) {
+	$.get('/disconnect/' + providerName + '/' + sessionID);
+	$('#' + providerName + '_disconnected').css('display', 'block');
+	$('#' + providerName + '_connected').css('display', 'none');
 }
