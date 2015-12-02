@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 var express = require('express')
   , app = express()
 // load up the certificates
@@ -49,8 +54,6 @@ passport.use(new GoogleStrategy(googleConfig,
       userData.providers.push({
         accessToken: accessToken,
         providerName: profile.provider,
-        accessTokenExpiry: '',
-        refreshToken: refreshToken,
         familyName: profile.name.familyName,
         givenName: profile.name.givenName,
         name: profile.displayName
@@ -75,10 +78,6 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
     dbHelper.getUser(req.query.state, function (err, user) {
       var aadProfile = jwt.decode(params.id_token);
       console.log('User: ' + JSON.stringify(user));
-      // Extract the access token expiration date as a unix
-      // (millis) timestamp
-      var accessTokenExpiry =
-        jwt.decode(accessToken, { complete: true }).payload.exp;
   
       var userData = user || {};
       if (!userData.sessid) {
@@ -92,8 +91,6 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
       userData.providers.push({
         accessToken: accessToken,
         providerName: 'azure',
-        accessTokenExpiry: accessTokenExpiry,
-        refreshToken: refreshToken,
         familyName: aadProfile.family_name,
         givenName: aadProfile.given_name,
         name: aadProfile.name,
@@ -106,7 +103,6 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
           if (!err) {
             console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
           }
-          // TODO should this really be null? Or should be the err instance?
           done(null, userData);
         });
     });
@@ -143,7 +139,6 @@ app.use('/connect', connect);
 app.use('/disconnect', disconnect);
 
 passport.serializeUser(function (user, done) {
-  // keep those sessions light!
   done(null, user.sessid);
 });
 
@@ -183,6 +178,5 @@ app.use(function (err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;

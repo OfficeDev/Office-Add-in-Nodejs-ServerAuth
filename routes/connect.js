@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
 var express = require('express')
   , router = express.Router()
   , passport = require('passport')
@@ -22,7 +27,7 @@ io.on('connection', function (socket) {
   io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
 
-router.get('/auth/google/:sessionID', function(req, res, next) {
+router.get('/google/:sessionID', function(req, res, next) {
   passport.authenticate('google', 
     { 
       scope: 'profile', 
@@ -35,7 +40,8 @@ router.get('/auth/google/:sessionID', function(req, res, next) {
         var provider = user.providers[ii];
         providers.push({
           providerName: provider.providerName,
-          displayName: provider.name
+          displayName: provider.name,
+          sessionID: user.sessid
         });
       }
       io.to(user.sessid).emit('auth_success', providers);
@@ -44,7 +50,7 @@ router.get('/auth/google/:sessionID', function(req, res, next) {
   )(req, res, next);
 });
 
-router.get('/auth/google/callback', function(req, res, next) {
+router.get('/google/callback', function(req, res, next) {
   res.render('auth_complete');
 });
 
@@ -58,7 +64,8 @@ router.get('/azure/:sessionID', function(req, res, next) {
         var provider = user.providers[ii];
         providers.push({
           providerName: provider.providerName,
-          displayName: provider.name
+          displayName: provider.name,
+          sessionID: user.sessid
         });
       }
       io.to(user.sessid).emit('auth_success', providers);
@@ -72,7 +79,6 @@ router.get('/azure/callback', function(req, res, next) {
 });
 
 router.get('/error', function (req, res) {
-  // TODO prompt them to report an issue on Github
   res.status(500);
   res.send('An unexpected error was encountered.');
 });
