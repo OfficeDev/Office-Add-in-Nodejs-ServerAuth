@@ -3,7 +3,7 @@
  * See LICENSE in the project root for license information.
  */
 
-var socket = io.connect('https://localhost:3001', { secure: true });
+var socket = io.connect('https://serverauthnode.cloudapp.net:3001', { secure: true });
 // The token will only live in our database for 2 minutes
 var tokenLifetime = 120000;
 console.log(document.cookie);
