@@ -27,8 +27,6 @@ Your add-in must reliably identify the browser session that started the OAuth fl
 
 **Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
 
-> **Note:** <br /> The OAuth 2.0 authorization protocol specifies that the authorization server should perform an exact string comparison of the redirect_uri parameter with the redirect_uri value registered by the client. For this reason, you shouldn't attach query string parameters or additional path elements to the redirect_uri. 
-
 As an additional security measure, this sample deletes tokens from the database after two minutes of requesting them. You should implement token storage policies according to your application requirements.
 
 ## Prerequisites
@@ -67,6 +65,10 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
 6. Open Word or Excel and click **Insert** > **My add-ins** > **See all...**    
 7. Click **Shared Folder** if you deployed the add-in to a network share or **My Organization** if you deployed the add-in to the add-in catalog.
 8. Click **ServerAuth Sample**.
+
+## Credits
+
+This code sample is based on ideas originally published in a [blog post](http://blogs.msdn.com/b/richard_dizeregas_blog/archive/2015/08/10/connecting-to-office-365-from-an-office-add-in.aspx) by Richard diZerega. Richard is an evangelist at Microsoft who works with Office 365 developers.
 
 ## Questions and comments
 
