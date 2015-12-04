@@ -1,5 +1,0 @@
-https://login.microsoftonline.com/ed46058a-1957-405e-8d5a-fae110f41cb8/oauth2/authorize
-?response_type=code
-&redirect_uri=https%3A%2F%2Flocalhost%3A3000%2Fconnect%2Fazure%2Fcallback
-&client_id=656bfacf-5d64-418d-97dd-963e72d413de
-&resource=https%3A%2F%2Fgraph.microsoft.com
