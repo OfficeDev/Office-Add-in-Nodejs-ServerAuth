@@ -2,15 +2,15 @@
 
 [![Build Status](https://travis-ci.org/OfficeDev/Office-Add-in-NodeJS-ServerAuth.svg?branch=master)](https://travis-ci.org/OfficeDev/Office-Add-in-NodeJS-ServerAuth)
 
-A goal of many Office Add-in is to improve user productivity, you can get closer to achieve this goal with the help of 3rd party services. Most of today services implement the OAuth 2.0 specification to allow other applications into the user data.
+A goal of many Microsoft Office Add-ins is to improve user productivity. You can get closer to achieving this goal with the help of third-party services. Most of today's services implement the OAuth 2.0 specification to allow other applications into the user data.
 
 ![Office Add-in Server Authentication Sample screenshot](/readme-images/Office-Add-in-NodeJS-ServerAuth.png)
 
-You must keep in mind that Office Add-ins run in a variety of platforms and devices. This presents a great opportunity for your add-in, but you must be aware of the following considerations when you try to make OAuth flows work across a combination of platforms and technologies.
+Keep in mind that Office Add-ins run on a variety of platforms and devices, which presents a great opportunity for your add-in. You must be aware, however, of the following considerations when you try to make OAuth flows work across a combination of platforms and technologies.
 
 ## Design considerations
 
-Some versions of Office use an iframe to display the add-in. This poses an inconvenience for OAuth flows. The authentication flow in OAuth uses a sign-in page that can't be displayed in an iframe. The reason behind is to minimize the risk that a malicious page takes control of the sign-in page. Your add-in should not try to display the OAuth sign-in page in the main add-in window.
+Some versions of Office use an iframe to display the add-in. This use of an iframe poses an inconvenience for OAuth flows. The authentication flow in OAuth uses a sign-in page that can't be displayed in an iframe. The reason for this is to minimize the risk that a malicious page could take control of the sign-in page. Your add-in should not try to display the OAuth sign-in page in the main add-in window.
 
 **Solution:** Start the OAuth flow from a pop-up page.
 
@@ -21,13 +21,13 @@ Some browsers, most notably Internet Explorer, have the concept of security zone
 
 Because of the security zones mentioned previously, we can't ensure that the pop-up and the main add-in page share the same session identifier in your add-in. If this is the case, the add-in server doesn't have a way to determine what main add-in page it needs to notify.
 
-**Solution:** Use the main page session id to identify the browser session. If you have to open a pop-up, send the session identifier as part of the path or query string.
+**Solution:** Use the main page session ID to identify the browser session. If you have to open a pop-up, send the session identifier as part of the path or query string.
 
-Your add-in must reliably identify the browser session that started the OAuth flow. When the flow returns to the configured redirect URI your add-in needs to decide what browser session owns the tokens. If your add-in pages are in different security zones, the add-in will not be able to assign the tokens to the right browser session.
+Your add-in must reliably identify the browser session that started the OAuth flow. When the flow returns to the configured redirect URI, your add-in needs to decide which browser session owns the tokens. If your add-in pages are in different security zones, the add-in won't be able to assign the tokens to the right browser session.
 
-**Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). 
+**Solution:** Use the state parameter in the OAuth flow to identify the session that owns the tokens. Further discussion about this technique can be found in [Encoding claims in the OAuth 2 state parameter using a JWT](https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-04). Note that the article is a work in progress. 
 
-As an additional security measure, this sample deletes tokens from the database after two minutes of requesting them. You should implement token storage policies according to your application requirements.
+As an additional security measure, this sample deletes tokens from the database within two minutes of requesting them. You should implement token storage policies according to your application requirements.
 
 ## Prerequisites
 
@@ -36,14 +36,14 @@ To use the Office Add-in Server Authentication sample, you need the following:
 * [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
 * The dependencies require Python version 2.7 and XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with C++ features installed (Windows).
-* App registration in Azure and/or Google services. Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization.
+* App registration in Microsoft Azure and/or Google services. Microsoft Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization.
     * You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) to register your app. The sample requires the **Microsoft Graph** > **Sign in and read user profile** delegated permission. Add **https://localhost:3000/connect/azure/callback** to the list of reply URLs.
     * You can register your app in [Google Developers Console](https://console.developers.google.com/). The sample requires the **Google+ API** to be enabled. Add **https://localhost:3000/connect/google/callback** to the list of authorized redirect URIs.
 * A ```client ID``` and ```secret``` values of an application registered in Azure and/or Google.
 
 ## Deploy the add-in
 
-See [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx) to install the add-in to your Office desktop applications or [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx) if you want to install the add-in to your organization's add-in catalog.
+See [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx) to install the add-in to your Microsoft Office desktop applications or [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx) if you want to install the add-in in your organization's add-in catalog.
 
 ## Configure and run the app
 
@@ -61,9 +61,9 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     ```
 
     > **Note:** <br />
-    The sample uses a self-signed certificate to serve the site using the https protocol. The sample requires you to trust the certificate to run properly. You can also generate your own self-signed certificate using the **ss_certgen.sh** script, which requires [OpenSSL](http://www.openssl.org/) to run.
-6. Open Word or Excel and click **Insert** > **My add-ins** > **See all...**    
-7. Click **Shared Folder** if you deployed the add-in to a network share or **My Organization** if you deployed the add-in to the add-in catalog.
+    The sample uses a self-signed certificate to serve the site by using the https protocol. The sample requires you to trust the certificate to run properly. You can also generate your own self-signed certificate by using the **ss_certgen.sh** script, which requires [OpenSSL](http://www.openssl.org/) to run.
+6. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
+7. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
 8. Click **ServerAuth Sample**.
 
 ## Credits
@@ -83,4 +83,4 @@ Questions about Office 365 development in general should be posted to [Stack Ove
 * [Anatomy of an Add-in](https://msdn.microsoft.com/library/office/jj220082.aspx#StartBuildingApps_AnatomyofApp)
 
 ## Copyright
-Copyright (c) 2015 Microsoft. All rights reserved.
+Copyright (c) 2015 Microsoft Corporation. All rights reserved.
