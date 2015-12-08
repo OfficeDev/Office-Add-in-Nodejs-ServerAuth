@@ -12,7 +12,7 @@ var express = require('express')
   , dbHelper = new (require('../db-helper'))();
 
 function disconnectService(user, serviceName) {
-  // remove the supplied service from the provided user
+  // Remove the supplied service from the provided user
   for (var ii = 0; ii < user.providers.length; ii++) {
     if (user.providers[ii].providerName === serviceName) {
       user.providers.splice(ii, 1);
@@ -40,10 +40,10 @@ router.get('/google/complete/:sessionID', function (req, res, next) {
 router.get('/google/:sessionID', function (req, res) {
   dbHelper.getUser(req.params.sessionID, function (err, user) {
     // Get a temporary user object from the request
-    // Remove the azure provider from the user object
+    // Remove the Azure provider from the user object
     var updatedUser = disconnectService(user, 'google');
     
-    // Remove the azure provider from the document
+    // Remove the Azure provider from the document
     dbHelper.insertDoc(updatedUser, null, function(err, body) {
       if(!err) {
         // Get the full URL of root to send it to the logout endpoint
@@ -77,10 +77,10 @@ router.get('/azure/complete/:sessionID', function (req, res, next) {
 router.get('/azure/:sessionID', function (req, res) {
   dbHelper.getUser(req.params.sessionID, function (err, user) {
     // Get a temporary user object from the request
-    // Remove the azure provider from the user object
+    // Remove the Azure provider from the user object
     var updatedUser = disconnectService(user, 'azure');
     
-    // Remove the azure provider from the document
+    // Remove the Azure provider from the document
     dbHelper.insertDoc(updatedUser, null, function(err, body) {
       if(!err) {
         // Get the full URL of root to send it to the logout endpoint

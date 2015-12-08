@@ -53,7 +53,7 @@ function _insertDoc(doc, params, tried, callback) {
 					console.log("creating db");
 					return nano.db.create(dbName, function () {
 						console.log("reattempting insert")
-						// create the view we will need to lookup users later
+						// create the view we will need to look up users later
 						db.insert({
 							views: {
 								by_sessionID: {
