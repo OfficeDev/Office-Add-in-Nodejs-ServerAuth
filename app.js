@@ -72,7 +72,7 @@ passport.use(new GoogleStrategy(googleConfig,
     });
   }));
 
-// teach passport how to use azure
+// teach passport how to use Azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
   function (req, accessToken, refreshToken, params, profile, done) {
     dbHelper.getUser(req.query.state, function (err, user) {

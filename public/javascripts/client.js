@@ -8,7 +8,7 @@ var socket = io.connect('https://localhost:3001', { secure: true });
 var tokenLifetime = 120000;
 console.log(document.cookie);
 
-// respond to the init event - this is for debugging
+// Respond to the init event - this is for debugging
 socket.on('init', function (data) {
 	console.log(data);
 });
@@ -16,7 +16,7 @@ socket.on('init', function (data) {
 socket.on('auth_success', function (providers) {
 	console.log('auth_success: ' + JSON.stringify(providers));
 	// Show the 'connected' UI for the providers
-	// that the user has signed-in.
+	// that the user has signed in.
 	for (var ii = 0; ii < providers.length; ii++) {
 		var providerName = providers[ii].providerName;
 		var name = providers[ii].displayName;
@@ -34,7 +34,7 @@ socket.on('auth_success', function (providers) {
 socket.on('disconnect_complete', function (providers) {
 	console.log('disconnect_complete: ' + JSON.stringify(providers));
 	// Show the 'disconnected' UI for the providers
-	// that the user has signed-in.
+	// that the user has signed in.
 	for (var ii = 0; ii < providers.length; ii++) {
 		var providerName = providers[ii].providerName;
 		$('#' + providerName + '_disconnected').css('display', 'block');
@@ -46,7 +46,7 @@ socket.on('disconnect_complete', function (providers) {
 (function () {
     "use strict";
 
-    // The initialize function must be run each time a new page is loaded
+    // The initialize function must be run each time a new page is loaded.
     Office.initialize = function (reason) {
         $(document).ready(function () {
             //app.initialize();
@@ -54,7 +54,7 @@ socket.on('disconnect_complete', function (providers) {
     };
 })();
 
-// Writes data to the current document selection
+// Writes data to the current document selection.
 function setSelection(data) {
 	Office.context.document.setSelectedDataAsync(data);
 }
