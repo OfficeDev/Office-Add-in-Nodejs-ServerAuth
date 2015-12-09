@@ -15,7 +15,7 @@ Office applications display add-ins within an iframe on browser platforms. Many 
 **Solution:** Start the OAuth flow from a pop-up window
 
 After the OAuth flow is done, you might want to pass the tokens to your main add-in page and use them to make API calls to the 3rd party service. 
-Some browsers, most notably Internet Explorer, navigate within security boundaries (e.g. Zones). If pages are in different security zones, it’s not possible to pass tokens from the pop-up page to the main page.
+Some browsers, most notably Internet Explorer, navigate within security boundaries (e.g. Zones). If pages are in different security zones, itâ€™s not possible to pass tokens from the pop-up page to the main page.
 
 **Solution:** Store the tokens in a database and make the API calls from your server instead. Enable server-side communication via sockets to send authentication results to the main page. There are many libraries that make it easy to communicate between the server and the browser. This sample uses [Socket.io](http://socket.io) to notify the main add-in page that the OAuth flow is done.
 
@@ -50,21 +50,37 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
 1. Use a text editor to open ```ws-conf.js```.
 2. Replace *ENTER_YOUR_CLIENT_ID* with the client ID of your registered Azure or Google application.
 3. Replace *ENTER_YOUR_SECRET* with the client secret of your registered Azure or Google application.
-4. Install the dependencies running the following command:
+4. Generate a self-signed certificate using the included script: [`ss_certgen.sh`](/ss_certgen.sh).
+
+    To run the script, at your terminal:
+    ```
+    $ bash ss_certgen.sh
+    ```
+
+   After running the script, two files will be created in the project root:
+   ```
+   server.crt // the certificate
+   ```
+   
+   ```
+   server.key // the keyfile
+   ```
+   
+   > **Note:** <br />
+   `server.crt` and `server.key` must be present in the project root - they will be picked up automatically at runtime. To use an alternate path see [`certconf.js`](/certconf.js).
+
+5. Install the dependencies running the following command:
     ```
     npm install
     ```
 
-5. Start the application with the following command:
+6. Start the application with the following command:
     ```
     npm start
     ```
-
-    > **Note:** <br />
-    The sample uses a self-signed certificate to serve the site by using the https protocol. The sample requires you to trust the certificate to run properly. You can also generate your own self-signed certificate by using the **ss_certgen.sh** script, which requires [OpenSSL](http://www.openssl.org/) to run.
-6. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
-7. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
-8. Click **ServerAuth Sample**.
+7. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
+8. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
+9. Click **ServerAuth Sample**.
 
 ## Credits
 
