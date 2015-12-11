@@ -73,6 +73,9 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     ```
     npm install
     ```
+    
+    > **Note:** <br />
+    If you run into build errors on a Windows machine, add the following option ```--msvs_version=2015```.
 
 6. Start the application with the following command:
     ```
