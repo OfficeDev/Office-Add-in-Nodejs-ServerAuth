@@ -56,6 +56,11 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     $ bash ss_certgen.sh
     ```
 
+    > **Note:** <br />
+   Some Bash shells on Windows don't process carriage return characters correctly. If you run into an error like the following ```$'\r': command not found``` try to add the following option ```bash -o igncr ss_certgen.sh```.
+
+   The script guides you through the steps to generate a self-signed server certificate. Make sure to type *localhost* in the **Common Name** step.
+   
    After running the script, two files will be created in the project root:
    ```
    server.crt // the certificate
