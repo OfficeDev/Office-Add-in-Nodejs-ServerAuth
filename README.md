@@ -34,7 +34,7 @@ To use the Office Add-in Server Authentication sample, you need the following:
 * [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
 * The dependencies require Python version 2.7 and XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with C++ features installed (Windows).
-* The sample requires to serve the content over SSL by using a server certificate. The sample includes a script that requires [OpenSSL](http://openssl.org) to generate a self-signed certificate.
+* The sample serves the content over SSL by using a server certificate. The sample includes a script that requires [OpenSSL](http://openssl.org) to generate a self-signed certificate.
 * App registration in Microsoft Azure and/or Google services. Microsoft Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization.
     * You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) to register your app. The sample requires the **Microsoft Graph** > **Sign in and read user profile** delegated permission. Add **https://localhost:3000/connect/azure/callback** to the list of reply URLs.
     * You can register your app in [Google Developers Console](https://console.developers.google.com/). The sample requires the **Google+ API** to be enabled. Add **https://localhost:3000/connect/google/callback** to the list of authorized redirect URIs.
