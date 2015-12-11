@@ -85,6 +85,10 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     ```
     npm start
     ```
+    
+    > **Note:** <br />
+    You must trust the self-signed certificate so it can display properly in Office. See, [Trust your self-signed certificate](https://github.com/OfficeDev/Office-Add-in-NodeJS-ServerAuth/wiki/Trust-your-self-signed-certificate) for instructions.
+    
 7. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
 8. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
 9. Click **ServerAuth Sample**.
