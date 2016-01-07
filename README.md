@@ -57,7 +57,11 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     ```
     $ bash ss_certgen.sh
     ```
-    On Windows, run the following command from a command prompt:
+    On Git Bash for Windows
+    ```
+    $ winpty bash ss_certgen.sh
+    ```
+    On Cygwin for Windows
     ```
     > bash -o igncr ss_certgen.sh
     ```
