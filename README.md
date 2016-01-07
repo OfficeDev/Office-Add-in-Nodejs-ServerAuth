@@ -34,7 +34,7 @@ To use the Office Add-in Server Authentication sample, you need the following:
 * [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
 * The dependencies require Python version 2.7 and XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with [Common Tools for Visual C++ 2015](/readme-images/VSC++CommonTools.png) (Windows).
-* The sample requires a Bash shell, in Windows you can use Git for Windows or Cygwin. These two environments include OpenSSL, which the sample use to generate a self-signed certificate.
+* The sample requires a Bash shell, in Windows you can use Git for Windows or Cygwin. These two environments include OpenSSL, which the sample uses to generate a self-signed certificate.
 * App registration in Microsoft Azure and/or Google services. Microsoft Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization.
     * You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) to register your app. The sample requires the **Microsoft Graph** > **Sign in and read user profile** delegated permission. Add **https://localhost:3000/connect/azure/callback** to the list of reply URLs.
     * You can register your app in [Google Developers Console](https://console.developers.google.com/). The sample requires the **Google+ API** to be enabled. Add **https://localhost:3000/connect/google/callback** to the list of authorized redirect URIs.
@@ -86,8 +86,9 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     ```
     npm install --msvs_version=2015
     ```
-    
-6. Start the application with the following command:
+
+6. Make sure that your CouchDB server is running.    
+7. Start the application with the following command:
     ```
     npm start
     ```
@@ -95,9 +96,9 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     > **Note:** <br />
     You must trust the self-signed certificate so it can display properly in Office. See, [Trust your self-signed certificate](https://github.com/OfficeDev/Office-Add-in-NodeJS-ServerAuth/wiki/Trust-your-self-signed-certificate) for instructions.
     
-7. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
-8. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
-9. Click **ServerAuth Sample**.
+8. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
+9. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
+10. Click **ServerAuth Sample**.
 
 ## Credits
 
