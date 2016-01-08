@@ -91,8 +91,6 @@ Note that the default permissions are enough for this sample. For more informati
     $ bash -o igncr ss_certgen.sh
     ```
 
-   The script guides you through the steps to generate a self-signed server certificate. Make sure to type *localhost* in the **Common Name** step.
-   
    After running the script, two files will be created in the project root:
    ```
    server.crt // the certificate
