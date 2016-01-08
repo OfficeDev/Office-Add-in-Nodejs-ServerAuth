@@ -33,18 +33,46 @@ To use the Office Add-in Server Authentication sample, you need the following:
 
 * [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
-* The dependencies require Python version 2.7 and XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with [Common Tools for Visual C++ 2015](/readme-images/VSC++CommonTools.png) (Windows).
-* The sample requires a Bash shell, in Windows you can use Git for Windows or Cygwin. These two environments include OpenSSL, which the sample uses to generate a self-signed certificate.
-* App registration in Microsoft Azure and/or Google services. Microsoft Azure Active Directory (AD) and Google APIs provide identity services that applications use for authentication and authorization.
-    * You can use an [Azure trial subscription](https://account.windowsazure.com/SignUp) to register your app. The sample requires the **Microsoft Graph** > **Sign in and read user profile** delegated permission. Add **https://localhost:3000/connect/azure/callback** to the list of reply URLs.
-    * You can register your app in [Google Developers Console](https://console.developers.google.com/). The sample requires the **Google+ API** to be enabled. Add **https://localhost:3000/connect/google/callback** to the list of authorized redirect URIs.
+* Some dependencies require XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with [Common Tools for Visual C++ 2015](/readme-images/VSC++CommonTools.png) (Windows).
+* The sample requires a Bash shell, in Windows you can use Git Bash for Windows or Cygwin. Mac and Linux developers can use their standard terminals.
+    * The sample requires OpenSSL to generate a self-signed certificate. The mentioned Bash shells as well as most Mac and Linux Bash shells include a compatible version of OpenSSL.
 * A ```client ID``` and ```secret``` values of an application registered in Azure and/or Google.
 
-## Deploy the add-in
+## Register your app in Azure or Google
 
-See [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx) to install the add-in to your Microsoft Office desktop applications or [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx) if you want to install the add-in in your organization's add-in catalog.
+The ServerAuth sample supports apps registered in Azure or Google. You can test the sample with either services or both.
 
-## Configure and run the app
+### Register your app in Azure
+
+Register a web application in [Azure Management portal](https://manage.windowsazure.com) with the following configuration:
+
+Parameter | Value
+---------|--------
+Name | ServerAuth sample (optional)
+Type | Web application and/or web API
+Sign-on URL | https://localhost:3000/connect/azure/callback
+App ID URI | https://localhost:3000 (optional)
+
+Once you register your application, take note of the *client ID* and *client secret* values.
+
+Note that the default permissions are enough for this sample. For more information on how to register your app, see [Register your web server app with the Azure Management Portal](https://msdn.microsoft.com/office/office365/HowTo/add-common-consent-manually#bk_RegisterServerApp).
+
+### Register your app in Google
+
+Register a web application in [Google Developers Console](https://console.developers.google.com) with the following configuration:
+
+Parameter | Value
+---------|--------
+Project name | ServerAuth sample (optional)
+Credentials | OAuth client ID
+Application type | Web application
+Authorized redirect URIs | https://localhost:3000/connect/google/callback
+
+Once you register your application, take note of the *client ID* and *client secret* values.
+
+Note that the default permissions are enough for this sample. For more information on how to register your app, see [Developers Console Help](https://developers.google.com/console/help/new/).
+
+## Configure and run the web app
 
 1. Use a text editor to open ```ws-conf.js```.
 2. Replace *ENTER_YOUR_CLIENT_ID* with the client ID of your registered Azure or Google application.
@@ -53,21 +81,15 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
 
     To run the script, run the following command in your terminal:
     
-    On Linux/Mac
+    On Linux, Mac and Git Bash for Windows
     ```
     $ bash ss_certgen.sh
     ```
-    On Git Bash for Windows
-    ```
-    $ winpty bash ss_certgen.sh
-    ```
     On Cygwin for Windows
     ```
-    > bash -o igncr ss_certgen.sh
+    $ bash -o igncr ss_certgen.sh
     ```
 
-   The script guides you through the steps to generate a self-signed server certificate. Make sure to type *localhost* in the **Common Name** step.
-   
    After running the script, two files will be created in the project root:
    ```
    server.crt // the certificate
@@ -91,7 +113,7 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     npm install --msvs_version=2015
     ```
 
-6. Make sure that your CouchDB server is running.    
+6. Make sure that your CouchDB server is running. Go to [Futon](http://localhost:5984/_utils) in your local server and verify that the page loads correctly. To start CouchDB use the `CouchDB` script located in the *bin* folder in your CouchDB installation.
 7. Start the application with the following command:
     ```
     npm start
@@ -101,8 +123,45 @@ See [Create a network shared folder catalog for task pane and content add-ins](h
     You must trust the self-signed certificate so it can display properly in Office. See, [Trust your self-signed certificate](https://github.com/OfficeDev/Office-Add-in-NodeJS-ServerAuth/wiki/Trust-your-self-signed-certificate) for instructions.
     
 8. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
-9. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
-10. Click **ServerAuth Sample**.
+9. Choose **Shared Folder** if you deployed the add-in to a network share, or **My Organization** if you deployed the add-in to the add-in catalog.
+10. Select **ServerAuth Sample**.
+
+## Deploy the add-in
+
+To make the add-in available in your Office client, you must deploy the manifest to a folder share. If you want to use the add-in in Word or Excel Online you must deploy the manifest to the add-in catalog.
+
+### To deploy the manifest to a folder share
+
+1. Create a folder on a network share, for example \\MyShare\MyManifests.
+2. Copy the manifest files from the root folder of this sample and paste to the network share.
+3. Open a new document in Excel or Word.
+4. Choose the File tab, and then choose Options.
+5. Choose Trust Center, and then choose the Trust Center Settings button.
+6. Choose Trusted Add-in Catalogs.
+7. In the Catalog Url box, enter the path to the network share you created in Step 1, and then choose Add Catalog.
+8. Select the Show in Menu check box, and then choose OK.
+
+For a detailed explanation of the previous process, see [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx).
+
+### To deploy the manifest to the add-in catalog
+
+1. Browse to the add-in catalog.
+2. Choose **Apps for Office** from the left navigation bar.
+3. Choose **Upload**, and then **Choose files** to browse to the *manifest.xml* file in the root folder of this sample.
+4. Choose **OK**.
+
+For a detailed explanation of the previous process, see [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx).
+
+## Open the add-in in Word or Excel
+
+You can try the ServerAuth sample in Word or Excel desktop clients if you deployed the manifest to a network share or in Word or Excel Online if you deployed the manifest to the add-in catalog.
+
+To open the add-in:
+
+1. Open Word or Excel.
+2. Choose **My Add-ins** on the **Insert** tab.
+3. Choose **Shared Folder** if you deployed the manifest to a network share or **My Organization** if you deployed the manifest to the add-in catalog.
+4. Choose **ServerAuth sample**.
 
 ## Credits
 
