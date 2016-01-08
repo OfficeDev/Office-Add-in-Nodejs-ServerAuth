@@ -33,7 +33,6 @@ To use the Office Add-in Server Authentication sample, you need the following:
 
 * [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
-* Some dependencies require Python version 2.7.
 * Some dependencies require XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with [Common Tools for Visual C++ 2015](/readme-images/VSC++CommonTools.png) (Windows).
 * The sample requires a Bash shell, in Windows you can use Git Bash for Windows or Cygwin. Mac and Linux developers can use their standard terminals.
     * The sample requires OpenSSL to generate a self-signed certificate. The mentioned Bash shells as well as most Mac and Linux Bash shells include a compatible version of OpenSSL.
