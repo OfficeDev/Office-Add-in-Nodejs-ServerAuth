@@ -130,8 +130,45 @@ Note that the default permissions are enough for this sample. For more informati
     You must trust the self-signed certificate so it can display properly in Office. See, [Trust your self-signed certificate](https://github.com/OfficeDev/Office-Add-in-NodeJS-ServerAuth/wiki/Trust-your-self-signed-certificate) for instructions.
     
 8. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
-9. Click **Shared Folder** if you deployed the add-in to a network share, or click **My Organization** if you deployed the add-in to the add-in catalog.
-10. Click **ServerAuth Sample**.
+9. Choose **Shared Folder** if you deployed the add-in to a network share, or **My Organization** if you deployed the add-in to the add-in catalog.
+10. Select **ServerAuth Sample**.
+
+## Deploy the add-in
+
+To make the add-in available in your Office client, you must deploy the manifest to a folder share. If you want to use the add-in in Word or Excel Online you must deploy the manifest to the add-in catalog.
+
+### To deploy the manifest to a folder share
+
+1. Create a folder on a network share, for example \\MyShare\MyManifests.
+2. Copy the manifest files from the root folder of this sample and paste to the network share.
+3. Open a new document in Excel or Word.
+4. Choose the File tab, and then choose Options.
+5. Choose Trust Center, and then choose the Trust Center Settings button.
+6. Choose Trusted Add-in Catalogs.
+7. In the Catalog Url box, enter the path to the network share you created in Step 1, and then choose Add Catalog.
+8. Select the Show in Menu check box, and then choose OK.
+
+For a detailed explanation of the previous process, see [Create a network shared folder catalog for task pane and content add-ins](https://msdn.microsoft.com/library/office/fp123503.aspx).
+
+### To deploy the manifest to the add-in catalog
+
+1. Browse to the add-in catalog.
+2. Choose **Apps for Office** from the left navigation bar.
+3. Choose **Upload**, and then **Choose files** to browse to the *manifest.xml* file in the root folder of this sample.
+4. Choose **OK**.
+
+For a detailed explanation of the previous process, see [Publish task pane and content add-ins to an add-in catalog on SharePoint](https://msdn.microsoft.com/library/office/fp123517.aspx).
+
+## Open the add-in in Word or Excel
+
+You can try the ServerAuth sample in Word or Excel desktop clients if you deployed the manifest to a network share or in Word or Excel Online if you deployed the manifest to the add-in catalog.
+
+To open the add-in:
+
+1. Open Word or Excel.
+2. Choose **My Add-ins** on the **Insert** tab.
+3. Choose **Shared Folder** if you deployed the manifest to a network share or **My Organization** if you deployed the manifest to the add-in catalog.
+4. Choose **ServerAuth sample**.
 
 ## Credits
 
