@@ -1,4 +1,4 @@
-if [[ uname == *"MINGW"* ]]
+if [[ $(uname) == *"MINGW"* ]]
 then
     openssl req \
         -new \
