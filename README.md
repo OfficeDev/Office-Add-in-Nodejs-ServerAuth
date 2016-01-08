@@ -114,7 +114,7 @@ Note that the default permissions are enough for this sample. For more informati
     npm install --msvs_version=2015
     ```
 
-6. Make sure that your CouchDB server is running.    
+6. Make sure that your CouchDB server is running. Go to [Futon](http://localhost:5984/_utils) in your local server and verify that the page loads correctly. To start CouchDB use the `CouchDB` script located in the *bin* folder in your CouchDB installation.
 7. Start the application with the following command:
     ```
     npm start
