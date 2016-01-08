@@ -82,17 +82,13 @@ Note that the default permissions are enough for this sample. For more informati
 
     To run the script, run the following command in your terminal:
     
-    On Linux/Mac
+    On Linux, Mac and Git Bash for Windows
     ```
     $ bash ss_certgen.sh
     ```
-    On Git Bash for Windows
-    ```
-    $ winpty bash ss_certgen.sh
-    ```
     On Cygwin for Windows
     ```
-    > bash -o igncr ss_certgen.sh
+    $ bash -o igncr ss_certgen.sh
     ```
 
    The script guides you through the steps to generate a self-signed server certificate. Make sure to type *localhost* in the **Common Name** step.
