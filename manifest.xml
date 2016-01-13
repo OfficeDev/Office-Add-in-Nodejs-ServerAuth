@@ -9,7 +9,7 @@
   <ProviderName>OfficeDev</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ServerAuth sample"/>
-  <Description DefaultValue="Office Add-in ServerAuth sample for NodeJS"/>
+  <Description DefaultValue="Office add-in ServerAuth sample for Node.js"/>
   <SupportUrl DefaultValue="https://github.com/officedev/office-add-in-nodejs-serverauth/issues"/>
   <Hosts>
     <Host Name="Document"/>

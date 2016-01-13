@@ -15,7 +15,7 @@ exports.azureConf = {
 
 exports.googleConf = {
     clientID: '966609587541-c3j11ichfkpue01hv3ghqo2hj0la8aab.apps.googleusercontent.com',
-    clientSecret: '3XzN7EhwX5tVa29w_E5hTxvh',
-    callbackURL: "https://localhost:3000/connect/google/callback",
+    clientSecret: '2mvi7XnsyGZJ0fnmmIqN-FWs',
+    callbackURL: 'https://localhost:3000/connect/google/callback',
     passReqToCallback: true
 };

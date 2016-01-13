@@ -38,9 +38,7 @@ var path = require('path')
 passport.use(new GoogleStrategy(googleConfig,
   function (req, accessToken, refreshToken, profile, done) {
     dbHelper.getUser(req.query.state, function (err, user) {
-      console.log('google accessToken: ' + accessToken);
-      console.log('google refresh token: ' + refreshToken);
-      console.log('google profile: ' + JSON.stringify(profile));
+      console.log('Google profile: ' + JSON.stringify(profile));
   
       // get the user or init a new one
       var userData = user || {};
@@ -62,13 +60,10 @@ passport.use(new GoogleStrategy(googleConfig,
       dbHelperInstance.insertDoc(userData, null,
         function (err, body) {
           if (!err) {
-            console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
+            console.log('Inserted session entry [' + userData.sessid + '] id: ' + body.id);
           }
           done(err, userData);
         });
-  
-      // signal the client window (via socket) to update
-      // update the user record in the db
     });
   }));
 
@@ -101,7 +96,7 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
       dbHelperInstance.insertDoc(userData, null,
         function (err, body) {
           if (!err) {
-            console.log("Inserted session entry [" + userData.sessid + "] id: " + body.id);
+            console.log('Inserted session entry [' + userData.sessid + '] id: ' + body.id);
           }
           done(null, userData);
         });
@@ -112,8 +107,6 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

@@ -7,7 +7,7 @@ var express = require('express')
   , router = express.Router()
   , passport = require('passport')
   , io = require('../app')
-  , cookie = require("cookie")
+  , cookie = require('cookie')
   , cookieParser = require('cookie-parser')
   , dbHelper = new (require('../db-helper'))();
 
@@ -44,6 +44,8 @@ router.get('/google/:sessionID', function(req, res, next) {
           sessionID: user.sessid
         });
       }
+      // signal the client window (via socket) to
+      // update the user record in the db
       io.to(user.sessid).emit('auth_success', providers);
       next();
     }
@@ -68,6 +70,8 @@ router.get('/azure/:sessionID', function(req, res, next) {
           sessionID: user.sessid
         });
       }
+      // signal the client window (via socket) to
+      // update the user record in the db
       io.to(user.sessid).emit('auth_success', providers);
       next();
     }

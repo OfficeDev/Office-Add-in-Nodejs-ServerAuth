@@ -4,7 +4,7 @@
  */
 
 var nano = require('nano')('http://localhost:5984')
-	, dbName = "user-session"
+	, dbName = 'user-session'
 	, db = nano.use(dbName);
 
 function DbHelper() { }
@@ -27,10 +27,10 @@ DbHelper.prototype.getUser = function getUser(sessid, callback) {
 		]
 	}, function (err, body) {
 		if (err || !body || !body.rows) {
-			console.log("getUser: " + err);
+			console.log('getUser: ' + err);
 			callback(err, body);
 		} else {
-			console.log("getUser: " + JSON.stringify(body));
+			console.log('getUser: ' + JSON.stringify(body));
 			if (body.rows.length == 1) {
 				callback(err, body.rows[0].value);
 			} else {
@@ -50,9 +50,9 @@ function _insertDoc(doc, params, tried, callback) {
 		function (err, body) {
 			if (err) {
 				if (err.message === 'no_db_file' && tried < 1) {
-					console.log("creating db");
+					console.log('creating db');
 					return nano.db.create(dbName, function () {
-						console.log("reattempting insert")
+						console.log('reattempting insert');
 						// create the view we will need to look up users later
 						db.insert({
 							views: {
@@ -76,4 +76,4 @@ function _insertDoc(doc, params, tried, callback) {
 		});
 }
 
-module.exports = DbHelper
+module.exports = DbHelper;

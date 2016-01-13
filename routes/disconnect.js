@@ -7,7 +7,7 @@ var express = require('express')
   , router = express.Router()
   , passport = require('passport')
   , io = require('../app')
-  , cookie = require("cookie")
+  , cookie = require('cookie')
   , cookieParser = require('cookie-parser')
   , dbHelper = new (require('../db-helper'))();
 
@@ -16,11 +16,11 @@ function disconnectService(user, serviceName) {
   for (var ii = 0; ii < user.providers.length; ii++) {
     if (user.providers[ii].providerName === serviceName) {
       user.providers.splice(ii, 1);
-      console.log("\n\nuser coming back: " + JSON.stringify(user));
+      console.log('\n\nuser coming back: ' + JSON.stringify(user));
       return user;
     }
   }
-  console.log("\n\nskipped user: " + JSON.stringify(user));
+  console.log('\n\nskipped user: ' + JSON.stringify(user));
   return user;
 }
 
