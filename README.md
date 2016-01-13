@@ -55,7 +55,7 @@ App ID URI | https://localhost:3000 (optional)
 
 Once you register your application, take note of the *client ID* and *client secret* values.
 
-Note that the default permissions are enough for this sample. For more information on how to register your app, see [Register your web server app with the Azure Management Portal](https://msdn.microsoft.com/office/office365/HowTo/add-common-consent-manually#bk_RegisterServerApp).
+The sample requires at least one enabled API to work. We tested this sample with the Google+ API enabled. For more information on how to register your app, see [Register your web server app with the Azure Management Portal](https://msdn.microsoft.com/office/office365/HowTo/add-common-consent-manually#bk_RegisterServerApp).
 
 ### Register your app in Google
 
