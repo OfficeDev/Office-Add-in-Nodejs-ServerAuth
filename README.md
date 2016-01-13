@@ -2,7 +2,7 @@
 
 A goal of many Microsoft Office add-ins is to improve user productivity. You can get closer to achieving this goal with the help of third-party services. Most of today's services implement the OAuth 2.0 specification to allow other applications into the user data.
 
-![Office add-in Server Authentication Sample screenshot](/readme-images/Office-add-in-Nodejs-ServerAuth.png)
+![Office Add-in Server Authentication Sample screenshot](/readme-images/Office-Add-in-Nodejs-ServerAuth.png)
 
 Keep in mind that Office add-ins run on a variety of platforms and devices, which presents a great opportunity for your add-in. You must be aware, however, of the following considerations when you try to make OAuth flows work across a combination of platforms and technologies.
 
