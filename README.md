@@ -33,10 +33,13 @@ To use the Office add-in Server Authentication sample, you need the following:
 
 * [Node.js](https://nodejs.org/) is required to run the sample. The sample has been tested on Node.js version 4.2.1.
 * [CouchDB](https://couchdb.apache.org) version 1.5.1 or greater.
-* Some dependencies require XCode version 6.3 or greater (Mac) or Visual Studio Express 2015 with [Common Tools for Visual C++ 2015](/readme-images/VSC++CommonTools.png) (Windows).
-* The sample requires a Bash shell, in Windows you can use Git Bash for Windows or Cygwin. Mac and Linux developers can use their standard terminals.
+* Some dependencies require a C++ compiler. The dependencies have been successfully built with the following compilers.
+    * Visual Studio Express 2015 with [Common Tools for Visual C++ 2015](/readme-images/VSC++CommonTools.png) on Windows.
+    * XCode version 6.3 on Mac OS.
+    * GNU Compiler Collection (GCC) version 4.8.4 on Linux.
+* The sample requires a Bash shell, in Windows you can use [Git Bash for Windows](https://git-for-windows.github.io/) or Cygwin. Mac and Linux developers can use their standard terminals.
     * The sample requires OpenSSL to generate a self-signed certificate. The mentioned Bash shells as well as most Mac and Linux Bash shells include a compatible version of OpenSSL.
-* A `client ID` and `key` values of an application registered in Azure Management Portal and/or `client ID` and `client secret` values of credentials of a project registered in Google Developers Console.
+* `Client ID` and `key` values of an application registered in Azure Management Portal and/or `client ID` and `client secret` values of credentials of a project registered in Google Developers Console.
 
 ## Register your app in Azure or Google
 
@@ -96,11 +99,11 @@ The sample requires at least one enabled API to work. We tested this sample with
    ```
    
    ```
-   server.key // the keyfile
+   server.key // the key file
    ```
    
    > **Note:** <br />
-   `server.crt` and `server.key` must be present in the project root - they will be picked up automatically at runtime. To use an alternate path see [`certconf.js`](/certconf.js).
+   The `server.crt` and `server.key` files must be present in the project root - they will be picked up automatically at runtime. To use an alternate path see [`certconf.js`](/certconf.js).
 
 5. Install the dependencies running the following command:
 
@@ -122,7 +125,7 @@ The sample requires at least one enabled API to work. We tested this sample with
     > **Note:** <br />
     You must trust the self-signed certificate so it can display properly in Office. See, [Trust your self-signed certificate](https://github.com/OfficeDev/Office-add-in-Nodejs-ServerAuth/wiki/Trust-your-self-signed-certificate) for instructions.
     
-8. Open Microsoft Word or Microsft Excel and click **Insert** > **My add-ins** > **See all**
+8. Open Microsoft Word or Microsoft Excel and click **Insert** > **My add-ins** > **See all**
 9. Choose **Shared Folder** if you deployed the add-in to a network share, or **My Organization** if you deployed the add-in to the add-in catalog.
 10. Select **ServerAuth Sample**.
 
