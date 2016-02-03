@@ -92,6 +92,11 @@ The sample requires at least one enabled API to work. We tested this sample with
     ```
     $ bash -o igncr ss_certgen.sh
     ```
+    > **Note:** <br />
+    Some OpenSSL installations on Windows throw the following error `Unable to load config info from /usr/local/ssl/openssl.cnf`. To specify the correct path, run the following command instead:
+    ```
+    $ OPENSSL_CONF='C:\Program Files (x86)\Git\ssl\openssl.cnf' bash ss_certgen.sh
+    ```
 
    After running the script, two files will be created in the project root:
    ```
