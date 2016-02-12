@@ -13,33 +13,9 @@ var app = require('../app');
 var debug = require('debug')('office-add-in-nodejs-serverauth:server');
 var https = require('https');
 var certConf = require('../certconf');
-var sqlite3 = require('sqlite3').verbose();
-var fs = require('fs');
+var dbHelper = new (require('../db/dbHelper'))();
 
-/**
- * Create SQLite3 database
- */
-var dbFile = './db/database.sqlite3';
-var dbExists = fs.existsSync(dbFile);
-var db = new sqlite3.Database(dbFile);
-var createTableStatement = 'CREATE TABLE UserData (' +
-                               'SessionID TEXT NOT NULL, ' + 
-                               'Provider TEXT  NOT NULL, ' +
-                               'AccessToken TEXT NOT NULL, ' + 
-                               'PRIMARY KEY (SessionID, Provider)' +
-                           ');';
-
-db.serialize(function() {
-    if(!dbExists) {
-        db.run(createTableStatement,
-               [],
-               function (error) { 
-                   console.log('Error creating UserData table: ' + error);
-               }
-              );
-    }
-});
-db.close();
+dbHelper.createDatabase();
 
 /**
  * Get port from environment and store in Express.
