@@ -9,7 +9,6 @@ var express = require('express')
   , certConf = require('./certconf')
 // create the socket server
   , socketServer = require('https').createServer(certConf, app)
-  , dbHelper = new (require('./db-helper'))
 // bind it to socket.io
   , io = require('socket.io')(socketServer);
 
@@ -29,7 +28,6 @@ var path = require('path')
   , routes = require('./routes/index')
   , connect = require('./routes/connect')
   , disconnect = require('./routes/disconnect')
-  , dbHelperInstance = new (require('./db-helper'))()
   , jwt = require('jsonwebtoken')
   , ONE_DAY_MILLIS = 86400000
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -37,71 +35,16 @@ var path = require('path')
 // teach passport how to use Google
 passport.use(new GoogleStrategy(googleConfig,
   function (req, accessToken, refreshToken, profile, done) {
-    dbHelper.getUser(req.query.state, function (err, user) {
-      console.log('Google profile: ' + JSON.stringify(profile));
-  
-      // get the user or init a new one
-      var userData = user || {};
-      if (!userData.sessid) {
-        userData.sessid = req.query.state;
-      }
-      if (!userData.providers) {
-        userData.providers = [];
-      }
-  
-      userData.providers.push({
-        accessToken: accessToken,
-        providerName: profile.provider,
-        familyName: profile.name.familyName,
-        givenName: profile.name.givenName,
-        name: profile.displayName
-      });
-  
-      dbHelperInstance.insertDoc(userData, null,
-        function (err, body) {
-          if (!err) {
-            console.log('Inserted session entry [' + userData.sessid + '] id: ' + body.id);
-          }
-          done(err, userData);
-        });
-    });
-  }));
+      req.session.googleAccessToken = accessToken;
+  })
+);
 
 // teach passport how to use Azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
-  function (req, accessToken, refreshToken, params, profile, done) {
-    dbHelper.getUser(req.query.state, function (err, user) {
-      var aadProfile = jwt.decode(params.id_token);
-      console.log('User: ' + JSON.stringify(user));
-  
-      var userData = user || {};
-      if (!userData.sessid) {
-        userData.sessid = req.query.state;
-      }
-  
-      if (!userData.providers) {
-        userData.providers = [];
-      }
-  
-      userData.providers.push({
-        accessToken: accessToken,
-        providerName: 'azure',
-        familyName: aadProfile.family_name,
-        givenName: aadProfile.given_name,
-        name: aadProfile.name,
-        uniqueName: aadProfile.unique_name,
-        ver: aadProfile.ver
-      });
-  
-      dbHelperInstance.insertDoc(userData, null,
-        function (err, body) {
-          if (!err) {
-            console.log('Inserted session entry [' + userData.sessid + '] id: ' + body.id);
-          }
-          done(null, userData);
-        });
-    });
-  }));
+    function (req, accessToken, refreshToken, params, profile, done) {
+        req.session.azureAccessToken = accessToken; 
+    })
+);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -131,16 +74,6 @@ app.use(favicon(path.join(__dirname + '/public/images/favicon.ico')));
 app.use('/', routes);
 app.use('/connect', connect);
 app.use('/disconnect', disconnect);
-
-passport.serializeUser(function (user, done) {
-  done(null, user.sessid);
-});
-
-passport.deserializeUser(function (sessid, done) {
-  dbHelperInstance.getUser(sessid, function (err, user) {
-    done(null, user);
-  });
-});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -8,8 +8,7 @@ var express = require('express')
   , passport = require('passport')
   , io = require('../app')
   , cookie = require('cookie')
-  , cookieParser = require('cookie-parser')
-  , dbHelper = new (require('../db-helper'))();
+  , cookieParser = require('cookie-parser');
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');

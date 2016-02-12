@@ -8,8 +8,7 @@ var express = require('express')
   , passport = require('passport')
   , io = require('../app')
   , cookie = require('cookie')
-  , cookieParser = require('cookie-parser')
-  , dbHelper = new (require('../db-helper'))();
+  , cookieParser = require('cookie-parser');
 
 function disconnectService(user, serviceName) {
   // Remove the supplied service from the provided user
@@ -38,31 +37,7 @@ router.get('/google/complete/:sessionID', function (req, res, next) {
 });
 
 router.get('/google/:sessionID', function (req, res) {
-  dbHelper.getUser(req.params.sessionID, function (err, user) {
-    // Get a temporary user object from the request
-    // Remove the Azure provider from the user object
-    var updatedUser = disconnectService(user, 'google');
-    
-    // Remove the Azure provider from the document
-    dbHelper.insertDoc(updatedUser, null, function(err, body) {
-      if(!err) {
-        // Get the full URL of root to send it to the logout endpoint
-        var appUrl = getDisconnectCompleteUrl(req, 'google', updatedUser.sessid);
-          console.log('Disconnect URL: ' + appUrl);
-        var logoutUrl = 'https://www.google.com/accounts/Logout'
-          + '?continue=https://appengine.google.com/_ah/logout?continue='
-          + appUrl;
-        res.redirect(logoutUrl);
-      } else if (err.message === 'Document update conflict.') {
-        console.log('Retry one more time');
-        dbHelper.getUser(req.params.sessionID, function (err, newUser) {
-          dbHelper.insertDoc(disconnectService(newUser, 'google'), null, function(err, newUser){});
-        });
-      } else {
-        console.log('Error updating document: ' + err.message);
-      }
-    });
-  });
+  req.session.googleAccessToken = null;
 });
 
 router.get('/azure/complete/:sessionID', function (req, res, next) {
@@ -75,30 +50,7 @@ router.get('/azure/complete/:sessionID', function (req, res, next) {
 });
 
 router.get('/azure/:sessionID', function (req, res) {
-  dbHelper.getUser(req.params.sessionID, function (err, user) {
-    // Get a temporary user object from the request
-    // Remove the Azure provider from the user object
-    var updatedUser = disconnectService(user, 'azure');
-    
-    // Remove the Azure provider from the document
-    dbHelper.insertDoc(updatedUser, null, function(err, body) {
-      if(!err) {
-        // Get the full URL of root to send it to the logout endpoint
-        var appUrl = getDisconnectCompleteUrl(req, 'azure', updatedUser.sessid);
-        var logoutUrl = 
-        'https://login.microsoftonline.com/common/oauth2/logout' + 
-        '?post_logout_redirect_uri=' + appUrl; 
-        res.redirect(logoutUrl);
-      } else if (err.message === 'Document update conflict.') {
-        console.log('Retry one more time');
-        dbHelper.getUser(req.params.sessionID, function (err, newUser) {
-          dbHelper.insertDoc(disconnectService(newUser, 'azure'), null, function(err, newUser){});
-        });
-      } else {
-        console.log('Error updating document: ' + err);
-      }
-    });
-  });
+  req.session.azureAccessToken = null;
 });
 
 module.exports = router;
