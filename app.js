@@ -11,6 +11,7 @@ var express = require('express')
   , socketServer = require('https').createServer(certConf, app)
 // bind it to socket.io
   , io = require('socket.io')(socketServer);
+var dbHelper = new (require('./db/dbHelper'))(); 
 
 socketServer.listen(3001);
 module.exports = io;
@@ -31,11 +32,25 @@ var path = require('path')
   , jwt = require('jsonwebtoken')
   , ONE_DAY_MILLIS = 86400000
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+  
+var util = require('util');
 
 // teach passport how to use Google
 passport.use(new GoogleStrategy(googleConfig,
   function (req, accessToken, refreshToken, profile, done) {
-      req.session.googleAccessToken = accessToken;
+    console.log('Inserting Google token in database');
+
+    dbHelper.saveAccessTokenGetUserData(
+        req.query.state, // This is the sessionId
+        profile.provider, // Contains the string 'google'
+        profile.displayName,
+        accessToken, 
+        function (error, userData) {
+            if (error === null) {
+                done(null, userData);
+            }
+        }
+    );
   })
 );
 

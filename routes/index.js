@@ -11,25 +11,20 @@ var dbHelper = new(require('../db/dbHelper'))();
 /* GET home page. */
 router.get('/', function (req, res, next) {
     console.log('Main session ID: ' + req.sessionID);
-    console.log('Main session: ' + util.inspect(req.session, false, null));
     
-    dbHelper.getProviderDisplayNameArray(req.sessionID, function (providerDisplayNameArray) {
-        var userState = {
-            sessionID : req.sessionID
-        };
+    dbHelper.getUserData(req.sessionID, function (error, userData) {
+        if (error !== null) {
+            console.log('Route index error: ' + error);
+        } else {
+            console.log('UserData: ' + util.inspect(userData, false, null));
+            
+            // Formatting the data so it's easier to render with Jade
+            for (var i = 0; userData.providers.length; i++) {
+                userData[userData.providers[i].providerName] = userData.providers[i];
+            }
         
-        // Create properties for each provider found in the database
-        // For example: 
-        //  userState.azure, userState.azureName
-        //  userState.google, userState.googleName....
-        for (var i = 0; i < providerDisplayNameArray.length; i++) {
-            console.log('Provider: ' + providerDisplayNameArray[i].Provider);
-            userState[providerDisplayNameArray[i].Provider] = true;
-            userState[providerDisplayNameArray[i].Provider + 'Name'] = providerDisplayNameArray[i].DisplayName;
-        }
-        console.log('UserState: ' + util.inspect(userState, false, null));
-    
-        res.render('index', userState); 
+            res.render('index', userData);
+        } 
     });
 });
 

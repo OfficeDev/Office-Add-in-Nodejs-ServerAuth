@@ -9,6 +9,8 @@ var express = require('express')
   , io = require('../app')
   , cookie = require('cookie')
   , cookieParser = require('cookie-parser');
+var dbHelper = new(require('../db/dbHelper'))();
+var util = require('util');
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');
@@ -33,19 +35,10 @@ router.get('/google/:sessionID', function(req, res, next) {
       accessType: 'offline', 
       state : req.params.sessionID 
     },
-    function(err, user) {
-      var providers = [];
-      for (var ii = 0; ii < user.providers.length; ii++) {
-        var provider = user.providers[ii];
-        providers.push({
-          providerName: provider.providerName,
-          displayName: provider.name,
-          sessionID: user.sessid
-        });
-      }
+    function(err, userData) {
       // signal the client window (via socket) to
       // update the user record in the db
-      io.to(user.sessid).emit('auth_success', providers);
+      io.to(userData.sessionId).emit('auth_success', userData);
       next();
     }
   )(req, res, next);

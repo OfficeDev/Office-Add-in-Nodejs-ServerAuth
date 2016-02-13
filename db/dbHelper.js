@@ -6,6 +6,7 @@
 var sqlite3 = require('sqlite3').verbose();
 var fs = require('fs');
 var dbFile = './db/database.sqlite3';
+var util = require('util');
 
 function dbHelper() { }
 
@@ -47,24 +48,42 @@ dbHelper.prototype.createDatabase = function createDatabase () {
 dbHelper.prototype.getProviderDisplayNameArray = function getProviderDisplayNameArray (sessionId, callback) {
     var db = new sqlite3.Database(dbFile);
     var selectStatement = 
-        'SELECT Provider, DisplayName FROM UserData WHERE SessionID = @sessionId';
+        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionId';
 
     db.serialize (function() {
         db.all (
             selectStatement,
             {
-                "@sessionId": sessionId
+                $sessionId: sessionId
             },
             function (error, providerDisplayNameArray) {
-                if (error !== null) {
-                    console.log('Error getting providers: ' + error);
-                } else {
-                    callback(providerDisplayNameArray);
-                }
+                callback(error, providerDisplayNameArray);
             }
         );
     });
-    db.close();
+}
+
+dbHelper.prototype.getUserData = function getUserData (sessionId, callback) {
+    var userData = {};
+    userData.sessionId = sessionId;
+    
+    var db = new sqlite3.Database(dbFile);
+    var getUserDataStatement = 
+        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionId';
+
+    db.serialize (function() {
+        db.all (
+            getUserDataStatement,
+            {
+                $sessionId: sessionId
+            },
+            function (error, providerDisplayNameArray) {
+                userData.providers = providerDisplayNameArray;
+                console.log('Userdata: ' + util.inspect(userData, false, null));
+                callback(error, userData);
+            }
+        );
+    });
 }
 
 /**
@@ -72,29 +91,51 @@ dbHelper.prototype.getProviderDisplayNameArray = function getProviderDisplayName
  * does not already exists.
  * If the record exists, update it with the new access token.
  */
-dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionId, provider, accessToken) {
+dbHelper.prototype.saveAccessTokenGetUserData = function saveAccessTokenGetUserData (sessionId, provider, displayName, accessToken, callback) {
     var db = new sqlite3.Database(dbFile);
-    var insertOrUpdateStatement = 
-        'if exists (SELECT Provider FROM UserData WHERE SessionID = @sessionId AND Provider = @provider)' +
-        'begin ' + 
-            'UPDATE UserData SET AccessToken = $accessToken WHERE SessionID = @sessionId AND Provider = @provider' +
-        'end ' +    
-        'else ' +
-        'begin ' +
-            'INSERT INTO UserData (SessionID, Provider, AccessToken) values (@sessionId, $provider, $accessToken) ' +
-        'end';
+    var selectStatement = 'SELECT Provider FROM UserData WHERE SessionID = $sessionId AND Provider = $provider';
+    var insertStatement = 'INSERT INTO UserData (SessionID, Provider, DisplayName, AccessToken) values ($sessionId, $provider, $displayName, $accessToken)'
+    var updateStatement = 'UPDATE UserData SET AccessToken = $accessToken, DisplayName = $displayName WHERE SessionID = $sessionId AND Provider = $provider'
+    var userDataStatement = 'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionId';
 
     db.serialize(function() {
-        db.run(
-            insertOrUpdateStatement,
+        db.get (
+            selectStatement,
             {
-                "@sessionId": sessionId,
-                "@provider": provider,
-                "@accessToken": accessToken
+                $sessionId: sessionId,
+                $provider: provider
+            },
+            function (err, row) {
+                // If there are no rows, the row is 'undefined', so we should insert.
+                // If there is a row, then we should update it.
+                var statement = typeof(row) === 'undefined' ? insertStatement : updateStatement; 
+                
+                db.run (
+                    statement,
+                    {
+                        $sessionId: sessionId,
+                        $provider: provider,
+                        $displayName: displayName,
+                        $accessToken: accessToken
+                    }
+                );
+                
+                db.all (
+                    userDataStatement,
+                    {
+                        $sessionId: sessionId
+                    },
+                    function (error, providerDisplayNameArray) {
+                        var userData = {};
+                        userData.sessionId = sessionId;
+                        userData.providers = providerDisplayNameArray;
+                        console.log('Userdata: ' + util.inspect(userData, false, null));
+                        callback(error, userData);
+                    }
+                );
             }
         );
     });
-    db.close();
 }
 
 module.exports = dbHelper;
