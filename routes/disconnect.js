@@ -29,8 +29,8 @@ function getDisconnectCompleteUrl(req, service, sessionID) {
 }
 
 router.get('/google/complete/:sessionID', function (req, res) {
-  io.to(req.params.sessionID).emit('disconnect_complete', 'google');
-  res.render('disconnect_complete');
+    io.to(req.params.sessionID).emit('disconnect_complete', 'google');
+    res.render('disconnect_complete');
 });
 
 router.get('/google/:sessionID', function (req, res) {
@@ -50,17 +50,25 @@ router.get('/google/:sessionID', function (req, res) {
     );
 });
 
-router.get('/azure/complete/:sessionID', function (req, res, next) {
-  var providers = [];
-  providers.push({
-      providerName: 'azure'
-  });
-  io.to(req.params.sessionID).emit('disconnect_complete', providers);
-  res.render('disconnect_complete');
+router.get('/azure/complete/:sessionID', function (req, res) {
+    io.to(req.params.sessionID).emit('disconnect_complete', 'azure');
+    res.render('disconnect_complete');
 });
 
 router.get('/azure/:sessionID', function (req, res) {
-  req.session.azureAccessToken = null;
+    dbHelper.deleteAccessToken (
+        req.params.sessionID,
+        'azure',
+        function (error) {
+            if (error === null) {
+                var appUrl = getDisconnectCompleteUrl(req, 'azure', req.params.sessionID);
+                console.log('Disconnect URL: ' + appUrl);
+                var logoutUrl = 'https://login.microsoftonline.com/common/oauth2/logout' +
+                '?post_logout_redirect_uri=' + appUrl;
+                res.redirect(logoutUrl);
+            }
+        }
+    );
 });
 
 module.exports = router;

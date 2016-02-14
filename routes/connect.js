@@ -50,20 +50,9 @@ router.get('/azure/:sessionID', function(req, res, next) {
   passport.authenticate(
     'azure', 
     { state: req.params.sessionID },
-    function (err, user) {
-      var providers = [];
-      for (var ii = 0; ii < user.providers.length; ii++) {
-        var provider = user.providers[ii];
-        providers.push({
-          providerName: provider.providerName,
-          displayName: provider.name,
-          sessionID: user.sessid
-        });
-      }
-      // signal the client window (via socket) to
-      // update the user record in the db
-      io.to(user.sessid).emit('auth_success', providers);
-      next();
+    function(err, authenticationData) {
+        io.to(authenticationData.sessionID).emit('auth_success', authenticationData);
+        next();
     }
   )(req, res, next);
 });

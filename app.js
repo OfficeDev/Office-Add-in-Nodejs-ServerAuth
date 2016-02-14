@@ -35,21 +35,19 @@ var path = require('path')
   
 var util = require('util');
 
-// teach passport how to use Google
+// Tell passport how to use Google
 passport.use(new GoogleStrategy(googleConfig,
   function (req, accessToken, refreshToken, profile, done) {
-    console.log('Inserting Google token in database');
-
     dbHelper.saveAccessToken (
         req.query.state, // This is the sessionID
-        profile.provider, // Contains the string 'google'
+        'google',
         profile.displayName,
         accessToken, 
         function (error) {
             if (error === null) {
                 var authenticationData = {};
                 authenticationData.sessionID = req.query.state;
-                authenticationData.providerName = profile.provider;
+                authenticationData.providerName = 'google';
                 authenticationData.displayName = profile.displayName;
                 done(null, authenticationData);
             }
@@ -58,10 +56,25 @@ passport.use(new GoogleStrategy(googleConfig,
   })
 );
 
-// teach passport how to use Azure
+// Tell passport how to use Azure
 passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
     function (req, accessToken, refreshToken, params, profile, done) {
-        req.session.azureAccessToken = accessToken; 
+        var azureProfile = jwt.decode(params.id_token);
+        dbHelper.saveAccessToken (
+            req.query.state, // This is the sessionID
+            'azure',
+            azureProfile.name,
+            accessToken, 
+            function (error) {
+                if (error === null) {
+                    var authenticationData = {};
+                    authenticationData.sessionID = req.query.state;
+                    authenticationData.providerName = 'azure';
+                    authenticationData.displayName = azureProfile.name;
+                    done(null, authenticationData);
+                }
+            }
+        ); 
     })
 );
 
