@@ -40,14 +40,18 @@ passport.use(new GoogleStrategy(googleConfig,
   function (req, accessToken, refreshToken, profile, done) {
     console.log('Inserting Google token in database');
 
-    dbHelper.saveAccessTokenGetUserData(
+    dbHelper.saveAccessToken (
         req.query.state, // This is the sessionID
         profile.provider, // Contains the string 'google'
         profile.displayName,
         accessToken, 
-        function (error, userData) {
+        function (error) {
             if (error === null) {
-                done(null, userData);
+                var authenticationData = {};
+                authenticationData.sessionID = req.query.state;
+                authenticationData.providerName = profile.provider;
+                authenticationData.displayName = profile.displayName;
+                done(null, authenticationData);
             }
         }
     );

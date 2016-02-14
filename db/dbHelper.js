@@ -91,12 +91,11 @@ dbHelper.prototype.getUserData = function getUserData (sessionID, callback) {
  * does not already exists.
  * If the record exists, update it with the new access token.
  */
-dbHelper.prototype.saveAccessTokenGetUserData = function saveAccessTokenGetUserData (sessionID, provider, displayName, accessToken, callback) {
+dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionID, provider, displayName, accessToken, callback) {
     var db = new sqlite3.Database(dbFile);
     var selectStatement = 'SELECT Provider FROM UserData WHERE SessionID = $sessionID AND Provider = $provider';
     var insertStatement = 'INSERT INTO UserData (SessionID, Provider, DisplayName, AccessToken) values ($sessionID, $provider, $displayName, $accessToken)'
     var updateStatement = 'UPDATE UserData SET AccessToken = $accessToken, DisplayName = $displayName WHERE SessionID = $sessionID AND Provider = $provider'
-    var userDataStatement = 'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionID';
 
     db.serialize(function() {
         db.get (
@@ -117,21 +116,8 @@ dbHelper.prototype.saveAccessTokenGetUserData = function saveAccessTokenGetUserD
                         $provider: provider,
                         $displayName: displayName,
                         $accessToken: accessToken
-                    }
-                );
-                
-                db.all (
-                    userDataStatement,
-                    {
-                        $sessionID: sessionID
                     },
-                    function (error, providerDisplayNameArray) {
-                        var userData = {};
-                        userData.sessionID = sessionID;
-                        userData.providers = providerDisplayNameArray;
-                        console.log('Userdata: ' + util.inspect(userData, false, null));
-                        callback(error, userData);
-                    }
+                    callback
                 );
             }
         );

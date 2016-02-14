@@ -14,19 +14,18 @@ socket.on('init', function (data) {
     console.log(data);
 });
 
-socket.on('auth_success', function (userData) {
-    // The server only sent data for the provider that just got updated.
-    var provider = userData.providers[0];
+socket.on('auth_success', function (authenticationData) {
+    console.log('Auth success: ' + authenticationData.sessionID);
     // Show the 'connected' UI for the authenticated provider
-    $('#' + provider.providerName + '_disconnected').css('display', 'none');
-    $('#' + provider.providerName + '_connected').css('display', 'block');
-    $('#' + provider.providerName + '_name').text('Name: ' + provider.displayName);
+    $('#' + authenticationData.providerName + '_disconnected').css('display', 'none');
+    $('#' + authenticationData.providerName + '_connected').css('display', 'block');
+    $('#' + authenticationData.providerName + '_name').text('Name: ' + authenticationData.displayName);
     
     // Initiate the disconnect flow when the token lifetime comes to an end.
-    timers[provider.providerName] = setTimeout("silentDisconnect('" + userData.sessionID + "', '" + provider.providerName + "')", tokenLifetime);
+    timers[authenticationData.providerName] = setTimeout("silentDisconnect('" + authenticationData.sessionID + "', '" + authenticationData.providerName + "')", tokenLifetime);
     
     //Update the Office host
-    Office.context.document.setSelectedDataAsync(provider.providerName + ' connected \nUser: ' + provider.displayName);
+    Office.context.document.setSelectedDataAsync(authenticationData.providerName + ' connected \nUser: ' + authenticationData.displayName);
 });
 
 socket.on('disconnect_complete', function (providerName) {

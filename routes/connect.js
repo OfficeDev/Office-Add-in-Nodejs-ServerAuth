@@ -19,13 +19,13 @@ io.on('connection', function (socket) {
       .handshake
       .headers
       .cookie);
-  var decodedNodeCookie =
+  var sessionID =
     cookieParser
       .signedCookie(jsonCookie.nodecookie, 'keyboard cat');
-  console.log('de-signed cookie: ' + decodedNodeCookie);
+  console.log('Session ID: ' + sessionID);
   // the sessionID becomes the room name for this session
-  socket.join(decodedNodeCookie);
-  io.to(decodedNodeCookie).emit('init', 'Private socket session established');
+  socket.join(sessionID);
+  io.to(sessionID).emit('init', 'Private socket session established');
 });
 
 router.get('/google/:sessionID', function(req, res, next) {
@@ -35,17 +35,8 @@ router.get('/google/:sessionID', function(req, res, next) {
       accessType: 'offline', 
       state : req.params.sessionID 
     },
-    function(err, userData) {
-        // Leave only the provider that just got updated
-        // so UI can easily update the view
-        for(var i = 0; i < userData.providers.length; i++) {
-            if (userData.providers[i].providerName !== 'google')  {
-                userData.providers.splice(i, 1);
-            }
-        }
-        // signal the client window (via socket) to
-        // update the UI
-        io.to(req.params.sessionID).emit('auth_success', userData);
+    function(err, authenticationData) {
+        io.to(authenticationData.sessionID).emit('auth_success', authenticationData);
         next();
     }
   )(req, res, next);
