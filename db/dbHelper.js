@@ -43,18 +43,18 @@ dbHelper.prototype.createDatabase = function createDatabase () {
 
 /**
  * Returns an object with the providers that have an access token in the database
- * for the specified sessionId.
+ * for the specified sessionID.
  */
-dbHelper.prototype.getProviderDisplayNameArray = function getProviderDisplayNameArray (sessionId, callback) {
+dbHelper.prototype.getProviderDisplayNameArray = function getProviderDisplayNameArray (sessionID, callback) {
     var db = new sqlite3.Database(dbFile);
     var selectStatement = 
-        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionId';
+        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionID';
 
     db.serialize (function() {
         db.all (
             selectStatement,
             {
-                $sessionId: sessionId
+                $sessionID: sessionID
             },
             function (error, providerDisplayNameArray) {
                 callback(error, providerDisplayNameArray);
@@ -63,19 +63,19 @@ dbHelper.prototype.getProviderDisplayNameArray = function getProviderDisplayName
     });
 }
 
-dbHelper.prototype.getUserData = function getUserData (sessionId, callback) {
+dbHelper.prototype.getUserData = function getUserData (sessionID, callback) {
     var userData = {};
-    userData.sessionId = sessionId;
+    userData.sessionID = sessionID;
     
     var db = new sqlite3.Database(dbFile);
     var getUserDataStatement = 
-        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionId';
+        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionID';
 
     db.serialize (function() {
         db.all (
             getUserDataStatement,
             {
-                $sessionId: sessionId
+                $sessionID: sessionID
             },
             function (error, providerDisplayNameArray) {
                 userData.providers = providerDisplayNameArray;
@@ -91,18 +91,18 @@ dbHelper.prototype.getUserData = function getUserData (sessionId, callback) {
  * does not already exists.
  * If the record exists, update it with the new access token.
  */
-dbHelper.prototype.saveAccessTokenGetUserData = function saveAccessTokenGetUserData (sessionId, provider, displayName, accessToken, callback) {
+dbHelper.prototype.saveAccessTokenGetUserData = function saveAccessTokenGetUserData (sessionID, provider, displayName, accessToken, callback) {
     var db = new sqlite3.Database(dbFile);
-    var selectStatement = 'SELECT Provider FROM UserData WHERE SessionID = $sessionId AND Provider = $provider';
-    var insertStatement = 'INSERT INTO UserData (SessionID, Provider, DisplayName, AccessToken) values ($sessionId, $provider, $displayName, $accessToken)'
-    var updateStatement = 'UPDATE UserData SET AccessToken = $accessToken, DisplayName = $displayName WHERE SessionID = $sessionId AND Provider = $provider'
-    var userDataStatement = 'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionId';
+    var selectStatement = 'SELECT Provider FROM UserData WHERE SessionID = $sessionID AND Provider = $provider';
+    var insertStatement = 'INSERT INTO UserData (SessionID, Provider, DisplayName, AccessToken) values ($sessionID, $provider, $displayName, $accessToken)'
+    var updateStatement = 'UPDATE UserData SET AccessToken = $accessToken, DisplayName = $displayName WHERE SessionID = $sessionID AND Provider = $provider'
+    var userDataStatement = 'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionID';
 
     db.serialize(function() {
         db.get (
             selectStatement,
             {
-                $sessionId: sessionId,
+                $sessionID: sessionID,
                 $provider: provider
             },
             function (err, row) {
@@ -113,7 +113,7 @@ dbHelper.prototype.saveAccessTokenGetUserData = function saveAccessTokenGetUserD
                 db.run (
                     statement,
                     {
-                        $sessionId: sessionId,
+                        $sessionID: sessionID,
                         $provider: provider,
                         $displayName: displayName,
                         $accessToken: accessToken
@@ -123,17 +123,38 @@ dbHelper.prototype.saveAccessTokenGetUserData = function saveAccessTokenGetUserD
                 db.all (
                     userDataStatement,
                     {
-                        $sessionId: sessionId
+                        $sessionID: sessionID
                     },
                     function (error, providerDisplayNameArray) {
                         var userData = {};
-                        userData.sessionId = sessionId;
+                        userData.sessionID = sessionID;
                         userData.providers = providerDisplayNameArray;
                         console.log('Userdata: ' + util.inspect(userData, false, null));
                         callback(error, userData);
                     }
                 );
             }
+        );
+    });
+}
+
+/**
+ * Insert access token to table UserData if the combination SessionID, Provider
+ * does not already exists.
+ * If the record exists, update it with the new access token.
+ */
+dbHelper.prototype.deleteAccessToken = function deleteAccessToken (sessionID, provider, callback) {
+    var db = new sqlite3.Database(dbFile);
+    var deleteStatement = 'DELETE FROM UserData WHERE SessionID = $sessionID AND Provider = $provider'
+
+    db.serialize(function() {
+        db.run (
+            deleteStatement,
+            {
+                $sessionID: sessionID,
+                $provider: provider
+            },
+            callback
         );
     });
 }

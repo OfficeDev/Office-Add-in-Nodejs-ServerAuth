@@ -13,7 +13,7 @@ block content
       div(
         class='ms-ListItem-primaryText ms-Link',
         title='Connect to Azure',
-        onclick="window.open('/connect/azure/#{sessionId}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
+        onclick="window.open('/connect/azure/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Azure
       span(class='ms-ListItem-secondaryText') Status: Disconnected
 
     div#azure_connected(style=(azure ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
@@ -21,7 +21,7 @@ block content
       span#azure_name(class='ms-ListItem-secondaryText') Name: #{ azure ? azure.displayName : '' }
       span(class='ms-ListItem-tertiaryText') Token available for 2 mins.
       div(class='ms-ListItem-actions')
-        a(class='ms-ListItem-action', onclick="window.open('/disconnect/azure/#{sessionId}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')")
+        a(class='ms-ListItem-action', onclick="window.open('/disconnect/azure/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')")
           i(class='ms-Icon ms-Icon--x', title='Disconnect from Azure')
 
     // Google
@@ -29,7 +29,7 @@ block content
       div(
         class='ms-ListItem-primaryText ms-Link',
         title='Connect to Google',
-        onclick="window.open('/connect/google/#{sessionId}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Google
+        onclick="window.open('/connect/google/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with Google
       span(class='ms-ListItem-secondaryText') Status: Disconnected
 
     div#google_connected(style=(google ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
@@ -37,7 +37,7 @@ block content
       span#google_name(class='ms-ListItem-secondaryText') Name: #{ google ? google.displayName : ''}
       span(class='ms-ListItem-tertiaryText') Token available for 2 mins.
       div(class='ms-ListItem-actions')
-        a(class='ms-ListItem-action', onclick="window.open('/disconnect/google/#{sessionId}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')")
+        a(class='ms-ListItem-action', onclick="window.open('/disconnect/google/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')")
           i(class='ms-Icon ms-Icon--x', title='Disconnect from Google')
 
   p.ms-font-l When you're done, click the (x) to disconnect from the service.

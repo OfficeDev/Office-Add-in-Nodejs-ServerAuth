@@ -23,7 +23,7 @@ io.on('connection', function (socket) {
     cookieParser
       .signedCookie(jsonCookie.nodecookie, 'keyboard cat');
   console.log('de-signed cookie: ' + decodedNodeCookie);
-  // the sessionId becomes the room name for this session
+  // the sessionID becomes the room name for this session
   socket.join(decodedNodeCookie);
   io.to(decodedNodeCookie).emit('init', 'Private socket session established');
 });
@@ -36,10 +36,17 @@ router.get('/google/:sessionID', function(req, res, next) {
       state : req.params.sessionID 
     },
     function(err, userData) {
-      // signal the client window (via socket) to
-      // update the user record in the db
-      io.to(userData.sessionId).emit('auth_success', userData);
-      next();
+        // Leave only the provider that just got updated
+        // so UI can easily update the view
+        for(var i = 0; i < userData.providers.length; i++) {
+            if (userData.providers[i].providerName !== 'google')  {
+                userData.providers.splice(i, 1);
+            }
+        }
+        // signal the client window (via socket) to
+        // update the UI
+        io.to(req.params.sessionID).emit('auth_success', userData);
+        next();
     }
   )(req, res, next);
 });
