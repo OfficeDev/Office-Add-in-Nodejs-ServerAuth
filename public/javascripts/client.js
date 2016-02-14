@@ -42,7 +42,5 @@ Office.initialize = function (reason) {
 };
 
 function silentDisconnect (sessionID, providerName) {
-    $.get('/disconnect/' + providerName + '/' + sessionID);
-    $('#' + providerName + '_disconnected').css('display', 'block');
-    $('#' + providerName + '_connected').css('display', 'none');
+    window.open('/disconnect/' + providerName + '/' + sessionID, 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1');
 }
