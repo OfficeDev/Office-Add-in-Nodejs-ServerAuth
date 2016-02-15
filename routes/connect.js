@@ -13,8 +13,9 @@ var dbHelper = new(require('../db/dbHelper'))();
 var util = require('util');
 
 var authenticationOptions = {};
-authenticationOptions['google'] = { scope: 'profile', accessType: 'offline' };
-authenticationOptions['azure'] = {};
+authenticationOptions['google'] = { session: false, scope: 'profile', accessType: 'offline' }
+authenticationOptions['azure'] = { session: false };
+var currentProvider;
 
 io.on('connection', function (socket) {
   console.log('Socket connection est');
@@ -32,18 +33,26 @@ io.on('connection', function (socket) {
   io.to(sessionID).emit('init', 'Private socket session established');
 });
 
-router.get('/:providerName/:sessionID', function(req, res, next) {
-  authenticationOptions[req.params.providerName].state = req.params.sessionID;
-  passport.authenticate(req.params.providerName, 
-    authenticationOptions[req.params.providerName],
-    function(err, authenticationData) {
-        io.to(authenticationData.sessionID).emit('auth_success', authenticationData);
+router.get(
+    '/google/:sessionID', 
+    function(req, res, next) {
+        authenticationOptions['google'].state = req.params.sessionID;
         next();
-    }
-  )(req, res, next);
-});
+    },
+    passport.authenticate('google', authenticationOptions['google'])
+);
+
+router.get(
+    '/azure/:sessionID', 
+    function(req, res, next) {
+        authenticationOptions['azure'].state = req.params.sessionID;
+        next();
+    },
+    passport.authenticate('azure', authenticationOptions['azure'])
+);
 
 router.get('/:providerName/callback', function(req, res) {
+  io.to(req.user.sessionID).emit('auth_success', req.user);
   res.render('auth_complete');
 });
 

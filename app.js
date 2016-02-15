@@ -36,24 +36,27 @@ var path = require('path')
 var util = require('util');
 
 // Tell passport how to use Google
-passport.use(new GoogleStrategy(googleConfig,
-  function (req, accessToken, refreshToken, profile, done) {
-    dbHelper.saveAccessToken (
-        req.query.state, // This is the sessionID
-        'google',
-        profile.displayName,
-        accessToken, 
-        function (error) {
-            if (error === null) {
-                var authenticationData = {};
-                authenticationData.sessionID = req.query.state;
-                authenticationData.providerName = 'google';
-                authenticationData.displayName = profile.displayName;
-                done(null, authenticationData);
+passport.use(new GoogleStrategy(
+    googleConfig,
+    function (req, accessToken, refreshToken, profile, done) {
+        dbHelper.saveAccessToken (
+            req.query.state, // This is the sessionID
+            'google',
+            profile.displayName,
+            accessToken, 
+            function (error) {
+                if (error) {
+                    done (error);
+                } else {
+                    var user = {};
+                    user.sessionID = req.query.state;
+                    user.providerName = 'google';
+                    user.displayName = profile.displayName;
+                    done(null, user);
+                }
             }
-        }
-    );
-  })
+        );
+    })
 );
 
 // Tell passport how to use Azure
@@ -67,11 +70,11 @@ passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
             accessToken, 
             function (error) {
                 if (error === null) {
-                    var authenticationData = {};
-                    authenticationData.sessionID = req.query.state;
-                    authenticationData.providerName = 'azure';
-                    authenticationData.displayName = azureProfile.name;
-                    done(null, authenticationData);
+                    var user = {};
+                    user.sessionID = req.query.state;
+                    user.providerName = 'azure';
+                    user.displayName = azureProfile.name;
+                    done(null, user);
                 }
             }
         ); 
