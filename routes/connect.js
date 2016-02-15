@@ -12,6 +12,10 @@ var express = require('express')
 var dbHelper = new(require('../db/dbHelper'))();
 var util = require('util');
 
+var authenticationOptions = {};
+authenticationOptions['google'] = { scope: 'profile', accessType: 'offline' };
+authenticationOptions['azure'] = {};
+
 io.on('connection', function (socket) {
   console.log('Socket connection est');
   var jsonCookie =
@@ -28,13 +32,10 @@ io.on('connection', function (socket) {
   io.to(sessionID).emit('init', 'Private socket session established');
 });
 
-router.get('/google/:sessionID', function(req, res, next) {
-  passport.authenticate('google', 
-    { 
-      scope: 'profile', 
-      accessType: 'offline', 
-      state : req.params.sessionID 
-    },
+router.get('/:providerName/:sessionID', function(req, res, next) {
+  authenticationOptions[req.params.providerName].state = req.params.sessionID;
+  passport.authenticate(req.params.providerName, 
+    authenticationOptions[req.params.providerName],
     function(err, authenticationData) {
         io.to(authenticationData.sessionID).emit('auth_success', authenticationData);
         next();
@@ -42,28 +43,8 @@ router.get('/google/:sessionID', function(req, res, next) {
   )(req, res, next);
 });
 
-router.get('/google/callback', function(req, res, next) {
+router.get('/:providerName/callback', function(req, res) {
   res.render('auth_complete');
-});
-
-router.get('/azure/:sessionID', function(req, res, next) {
-  passport.authenticate(
-    'azure', 
-    { state: req.params.sessionID },
-    function(err, authenticationData) {
-        io.to(authenticationData.sessionID).emit('auth_success', authenticationData);
-        next();
-    }
-  )(req, res, next);
-});
-
-router.get('/azure/callback', function(req, res, next) {
-  res.render('auth_complete');
-});
-
-router.get('/error', function (req, res) {
-  res.status(500);
-  res.send('An unexpected error was encountered.');
 });
 
 module.exports = router;
