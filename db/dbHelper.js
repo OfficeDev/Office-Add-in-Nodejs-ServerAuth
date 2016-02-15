@@ -6,7 +6,6 @@
 var sqlite3 = require('sqlite3').verbose();
 var fs = require('fs');
 var dbFile = './db/database.sqlite3';
-var util = require('util');
 
 var providers = [
     { $providerName: 'google', $providerNameCapitalized: 'Google' },
@@ -70,35 +69,6 @@ dbHelper.prototype.createDatabase = function createDatabase () {
     db.close();
 }
 
-/**
- * Returns an object with the providers that have an access token in the database
- * for the specified sessionID.
- */
-dbHelper.prototype.getProviderDisplayNameArray = function getProviderDisplayNameArray (sessionID, callback) {
-    var db = new sqlite3.Database(dbFile);
-    var selectStatement = 
-        'SELECT ' +
-  	    'Provider.ProviderName as providerName, ' +
-	    'Provider.ProviderNameCapitalized as providerNameCapitalized, ' +
-	    'UserData.SessionID as sessionID, ' +
-	    'UserData.DisplayName as displayName ' +
-        'FROM Provider LEFT JOIN UserData  ' +
-        'ON Provider.ProviderName = UserData.ProviderName  ' +
-        'WHERE UserData.SessionID = $sessionID';
-
-    db.serialize (function() {
-        db.all (
-            selectStatement,
-            {
-                $sessionID: sessionID
-            },
-            function (error, providerDisplayNameArray) {
-                callback(error, providerDisplayNameArray);
-            }
-        );
-    });
-}
-
 dbHelper.prototype.getUserData = function getUserData (sessionID, callback) {
     var userData = {};
     userData.sessionID = sessionID;
@@ -122,56 +92,30 @@ dbHelper.prototype.getUserData = function getUserData (sessionID, callback) {
             },
             function (error, providerDisplayNameArray) {
                 userData.providers = providerDisplayNameArray;
-                console.log('Userdata: ' + util.inspect(userData, false, null));
                 callback(error, userData);
             }
         );
     });
 }
 
-/**
- * Insert access token to table UserData if the combination SessionID, Provider
- * does not already exists.
- * If the record exists, update it with the new access token.
- */
 dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionID, providerName, displayName, accessToken, callback) {
     var db = new sqlite3.Database(dbFile);
-    var selectStatement = 'SELECT ProviderName FROM UserData WHERE SessionID = $sessionID AND ProviderName = $providerName';
     var insertStatement = 'INSERT INTO UserData (SessionID, ProviderName, DisplayName, AccessToken) values ($sessionID, $providerName, $displayName, $accessToken)'
-    var updateStatement = 'UPDATE UserData SET AccessToken = $accessToken, DisplayName = $displayName WHERE SessionID = $sessionID AND ProviderName = $providerName'
 
     db.serialize(function() {
-        db.get (
-            selectStatement,
+        db.run (
+            insertStatement,
             {
                 $sessionID: sessionID,
-                $providerName: providerName
+                $providerName: providerName,
+                $displayName: displayName,
+                $accessToken: accessToken
             },
-            function (err, row) {
-                // If there are no rows, the row is 'undefined', so we should insert.
-                // If there is a row, then we should update it.
-                var statement = typeof(row) === 'undefined' ? insertStatement : updateStatement; 
-                
-                db.run (
-                    statement,
-                    {
-                        $sessionID: sessionID,
-                        $providerName: providerName,
-                        $displayName: displayName,
-                        $accessToken: accessToken
-                    },
-                    callback
-                );
-            }
+            callback
         );
     });
 }
 
-/**
- * Insert access token to table UserData if the combination SessionID, Provider
- * does not already exists.
- * If the record exists, update it with the new access token.
- */
 dbHelper.prototype.deleteAccessToken = function deleteAccessToken (sessionID, providerName, callback) {
     var db = new sqlite3.Database(dbFile);
     var deleteStatement = 'DELETE FROM UserData WHERE SessionID = $sessionID AND ProviderName = $providerName'

@@ -23,7 +23,7 @@ var path = require('path')
   , bodyParser = require('body-parser')
   , passport = require('passport')
   , session = require('express-session')
-  , AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
+  , AzureStrategy = require('passport-azure-ad-oauth2')
   , azureConfig = require('./ws-conf').azureConf
   , googleConfig = require('./ws-conf').googleConf
   , routes = require('./routes/index')
@@ -32,8 +32,6 @@ var path = require('path')
   , jwt = require('jsonwebtoken')
   , ONE_DAY_MILLIS = 86400000
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-  
-var util = require('util');
 
 // Tell passport how to use Google
 passport.use(new GoogleStrategy(
@@ -60,7 +58,7 @@ passport.use(new GoogleStrategy(
 );
 
 // Tell passport how to use Azure
-passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
+passport.use('azure', new AzureStrategy(azureConfig,
     function (req, accessToken, refreshToken, params, profile, done) {
         var azureProfile = jwt.decode(params.id_token);
         dbHelper.saveAccessToken (
