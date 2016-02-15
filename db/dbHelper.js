@@ -8,6 +8,11 @@ var fs = require('fs');
 var dbFile = './db/database.sqlite3';
 var util = require('util');
 
+var providers = [
+    { $providerName: 'google', $providerNameCapitalized: 'Google' },
+    { $providerName: 'azure', $providerNameCapitalized: 'Azure' }
+]
+
 function dbHelper() { }
 
 /**
@@ -16,26 +21,50 @@ function dbHelper() { }
 dbHelper.prototype.createDatabase = function createDatabase () {
     var dbExists = fs.existsSync(dbFile);
     var db = new sqlite3.Database(dbFile);
-    var createTableStatement = 
+    var createUserDataStatement = 
         'CREATE TABLE UserData (' +
             'SessionID TEXT NOT NULL, ' + 
-            'Provider TEXT  NOT NULL, ' +
+            'ProviderName TEXT NOT NULL, ' +
             'DisplayName TEXT  NOT NULL, ' +
             'AccessToken TEXT NOT NULL, ' + 
-            'PRIMARY KEY (SessionID, Provider)' +
-        ');';
-
+            'PRIMARY KEY (SessionID, ProviderName)' +
+        ')';
+    var createProviderStatement = 
+        'CREATE TABLE Provider (' +
+            'ProviderName TEXT NOT NULL, ' + 
+            'ProviderNameCapitalized TEXT NOT NULL, ' +
+            'PRIMARY KEY (ProviderName)' +
+        ')';
+    var insertProvidersStatement = 
+        'INSERT INTO Provider (ProviderName, ProviderNameCapitalized) ' +
+        'VALUES ($providerName, $providerNameCapitalized)';
+        
     db.serialize(function() {
         if(!dbExists) {
             db.run(
-                createTableStatement,
+                createUserDataStatement,
                 [],
                 function (error) {
                     if (error !== null) {
                         console.log('Error creating UserData table: ' + error);
                     }
                 }
-                );
+            );
+            db.run(
+                createProviderStatement,
+                [],
+                function (error) {
+                    if (error !== null) {
+                        console.log('Error creating Provider table: ' + error);
+                    }
+                }
+            );
+            
+            var insertStatement = db.prepare(insertProvidersStatement);
+            for(var i = 0; i < providers.length; i++) {
+                insertStatement.run(providers[i]);
+            }
+            insertStatement.finalize();
         }
     });
     db.close();
@@ -48,7 +77,14 @@ dbHelper.prototype.createDatabase = function createDatabase () {
 dbHelper.prototype.getProviderDisplayNameArray = function getProviderDisplayNameArray (sessionID, callback) {
     var db = new sqlite3.Database(dbFile);
     var selectStatement = 
-        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionID';
+        'SELECT ' +
+  	    'Provider.ProviderName as providerName, ' +
+	    'Provider.ProviderNameCapitalized as providerNameCapitalized, ' +
+	    'UserData.SessionID as sessionID, ' +
+	    'UserData.DisplayName as displayName ' +
+        'FROM Provider LEFT JOIN UserData  ' +
+        'ON Provider.ProviderName = UserData.ProviderName  ' +
+        'WHERE UserData.SessionID = $sessionID';
 
     db.serialize (function() {
         db.all (
@@ -69,7 +105,14 @@ dbHelper.prototype.getUserData = function getUserData (sessionID, callback) {
     
     var db = new sqlite3.Database(dbFile);
     var getUserDataStatement = 
-        'SELECT Provider AS providerName, DisplayName as displayName FROM UserData WHERE SessionID = $sessionID';
+        'SELECT ' +
+        '    Provider.ProviderName as providerName, ' +
+        '    Provider.ProviderNameCapitalized as providerNameCapitalized, ' +
+        '    UserData.SessionID as isConnected, ' +
+        '    UserData.DisplayName as displayName ' +
+        'FROM Provider LEFT OUTER JOIN ( ' +
+        '    SELECT SessionID, ProviderName, DisplayName FROM UserData WHERE SessionID = $sessionID) UserData ' +
+        'ON Provider.ProviderName = UserData.ProviderName';
 
     db.serialize (function() {
         db.all (
@@ -91,18 +134,18 @@ dbHelper.prototype.getUserData = function getUserData (sessionID, callback) {
  * does not already exists.
  * If the record exists, update it with the new access token.
  */
-dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionID, provider, displayName, accessToken, callback) {
+dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionID, providerName, displayName, accessToken, callback) {
     var db = new sqlite3.Database(dbFile);
-    var selectStatement = 'SELECT Provider FROM UserData WHERE SessionID = $sessionID AND Provider = $provider';
-    var insertStatement = 'INSERT INTO UserData (SessionID, Provider, DisplayName, AccessToken) values ($sessionID, $provider, $displayName, $accessToken)'
-    var updateStatement = 'UPDATE UserData SET AccessToken = $accessToken, DisplayName = $displayName WHERE SessionID = $sessionID AND Provider = $provider'
+    var selectStatement = 'SELECT ProviderName FROM UserData WHERE SessionID = $sessionID AND ProviderName = $providerName';
+    var insertStatement = 'INSERT INTO UserData (SessionID, ProviderName, DisplayName, AccessToken) values ($sessionID, $providerName, $displayName, $accessToken)'
+    var updateStatement = 'UPDATE UserData SET AccessToken = $accessToken, DisplayName = $displayName WHERE SessionID = $sessionID AND ProviderName = $providerName'
 
     db.serialize(function() {
         db.get (
             selectStatement,
             {
                 $sessionID: sessionID,
-                $provider: provider
+                $providerName: providerName
             },
             function (err, row) {
                 // If there are no rows, the row is 'undefined', so we should insert.
@@ -113,7 +156,7 @@ dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionID, provid
                     statement,
                     {
                         $sessionID: sessionID,
-                        $provider: provider,
+                        $providerName: providerName,
                         $displayName: displayName,
                         $accessToken: accessToken
                     },
@@ -129,16 +172,16 @@ dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionID, provid
  * does not already exists.
  * If the record exists, update it with the new access token.
  */
-dbHelper.prototype.deleteAccessToken = function deleteAccessToken (sessionID, provider, callback) {
+dbHelper.prototype.deleteAccessToken = function deleteAccessToken (sessionID, providerName, callback) {
     var db = new sqlite3.Database(dbFile);
-    var deleteStatement = 'DELETE FROM UserData WHERE SessionID = $sessionID AND Provider = $provider'
+    var deleteStatement = 'DELETE FROM UserData WHERE SessionID = $sessionID AND ProviderName = $providerName'
 
     db.serialize(function() {
         db.run (
             deleteStatement,
             {
                 $sessionID: sessionID,
-                $provider: provider
+                $providerName: providerName
             },
             callback
         );

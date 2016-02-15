@@ -9,20 +9,14 @@ var util = require('util');
 var dbHelper = new(require('../db/dbHelper'))();
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', function (req, res) {
     console.log('Main session Id: ' + req.sessionID);
     
     dbHelper.getUserData(req.sessionID, function (error, userData) {
         if (error !== null) {
             console.log('Route index error: ' + error);
         } else {
-            console.log('UserData: ' + util.inspect(userData, false, null));
-            
-            // Formatting the data so it's easier to render with Jade
-            for (var i = 0; i < userData.providers.length; i++) {
-                userData[userData.providers[i].providerName] = userData.providers[i];
-            }
-        
+            userData.sessionID = req.sessionID;
             res.render('index', userData);
         } 
     });
