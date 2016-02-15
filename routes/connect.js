@@ -10,7 +10,6 @@ var express = require('express')
   , cookie = require('cookie')
   , cookieParser = require('cookie-parser');
 var dbHelper = new(require('../db/dbHelper'))();
-var util = require('util');
 
 var authenticationOptions = {};
 authenticationOptions['google'] = { session: false, scope: 'profile', accessType: 'offline' }
@@ -18,7 +17,6 @@ authenticationOptions['azure'] = { session: false };
 var currentProvider;
 
 io.on('connection', function (socket) {
-  console.log('Socket connection est');
   var jsonCookie =
     cookie.parse(socket
       .handshake
@@ -27,10 +25,8 @@ io.on('connection', function (socket) {
   var sessionID =
     cookieParser
       .signedCookie(jsonCookie.nodecookie, 'keyboard cat');
-  console.log('Session ID: ' + sessionID);
   // the sessionID becomes the room name for this session
   socket.join(sessionID);
-  io.to(sessionID).emit('init', 'Private socket session established');
 });
 
 router.get(

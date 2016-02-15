@@ -9,13 +9,7 @@ var socket = io.connect('https://localhost:3001', { secure: true });
 var tokenLifetime = 120000;
 var timers = {};
 
-// Respond to the init event - this is for debugging
-socket.on('init', function (data) {
-    console.log(data);
-});
-
 socket.on('auth_success', function (authenticationData) {
-    console.log('Auth success: ' + authenticationData.sessionID);
     // Show the 'connected' UI for the authenticated provider
     $('#' + authenticationData.providerName + '_disconnected').css('display', 'none');
     $('#' + authenticationData.providerName + '_connected').css('display', 'block');
