@@ -11,7 +11,6 @@ var certConf = require('./certconf');
 var socketServer = require('https').createServer(certConf, app);
 // bind it to socket.io
 var io = require('socket.io')(socketServer);
-var dbHelper = new (require('./db/dbHelper'))();
 
 socketServer.listen(3001);
 module.exports = io;
@@ -33,26 +32,26 @@ var jwt = require('jsonwebtoken');
 var ONE_DAY_MILLIS = 86400000;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
-function verifyGoogle (req, accessToken, refreshToken, profile, done) {
-    var user = {};
-    user.sessionID = req.query.state;
-    user.providerName = 'google';
-    user.displayName = profile.displayName;
-    user.accessToken = accessToken;
-    done(null, user);
+function verifyGoogle(req, accessToken, refreshToken, params, profile, done) {
+  var user = {};
+  user.sessionID = req.query.state;
+  user.providerName = profile.provider;
+  user.displayName = profile.displayName;
+  user.accessToken = accessToken;
+  done(null, user);
 }
 
-function verifyAzure (req, accessToken, refreshToken, params, profile, done) {
-    // Azure returns an id token with basic information about the user
-    var azureProfile = jwt.decode(params.id_token);
+function verifyAzure(req, accessToken, refreshToken, params, profile, done) {
+  // Azure returns an id token with basic information about the user
+  var azureProfile = jwt.decode(params.id_token);
 
-    // Create a new user object that will be available to
-    // the /connect/:providerName/callback route
-    var user = {};
-    user.sessionID = req.query.state;
-    user.providerName = 'azure';
-    user.displayName = azureProfile.name;
-    done(null, user);
+  // Create a new user object that will be available to
+  // the /connect/:providerName/callback route
+  var user = {};
+  user.sessionID = req.query.state;
+  user.providerName = 'azure';
+  user.displayName = azureProfile.name;
+  done(null, user);
 }
 
 // Tell passport how to use Google and Azure
@@ -89,10 +88,10 @@ app.use('/connect', connect);
 app.use('/disconnect', disconnect);
 
 // catch 404 and forward to error handler
-function error404Handler (req, res, next) {
+function error404Handler(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  next(err);    
+  next(err);
 }
 
 app.use(error404Handler);
@@ -101,14 +100,14 @@ app.use(error404Handler);
 
 // development error handler
 // will print stacktrace
-function error500DevHandler (err, req, res) {
-    res.status(err.status || 500);
-    res.render('error', 
-        {
-            message: err.message,
-            error: err
-        }
-    );
+function error500DevHandler(err, req, res) {
+  res.status(err.status || 500);
+  res.render('error',
+    {
+      message: err.message,
+      error: err
+    }
+  );
 }
 
 if (app.get('env') === 'development') {
@@ -117,12 +116,12 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-function error500ProdHandler (err, req, res) {
-    res.status(err.status || 500);
-    res.render('error', {
+function error500ProdHandler(err, req, res) {
+  res.status(err.status || 500);
+  res.render('error', {
     message: err.message,
     error: {}
-    });
+  });
 }
 
 app.use(error500ProdHandler);
