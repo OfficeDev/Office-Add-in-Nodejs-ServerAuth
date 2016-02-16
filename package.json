@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "mocha ./tests/confTest.js && node --debug-brk ./bin/www",
+    "start": "mocha ./tests/confTest.js && node ./bin/www",
     "lint": "eslint ."
   },
   "dependencies": {
