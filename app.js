@@ -51,6 +51,7 @@ function verifyAzure(req, accessToken, refreshToken, params, profile, done) {
   user.sessionID = req.query.state;
   user.providerName = 'azure';
   user.displayName = azureProfile.name;
+  user.accessToken = accessToken;
   done(null, user);
 }
 
