@@ -40,8 +40,20 @@ router.get(
 );
 
 router.get('/:providerName/callback', function(req, res) {
-    io.to(req.user.sessionID).emit('auth_success', req.user);
-    res.render('auth_complete');
+    dbHelper.saveAccessToken(
+        req.user.sessionID,
+        req.params.providerName,
+        req.user.displayName,
+        req.user.accessToken,
+        function doneSaving (error) {
+            // Intentionally strip the access token off the user object before
+            // sending it to the client.
+            // Client doesn't need it unless you want to make API calls client-side
+            req.user.accessToken = null;
+            io.to(req.user.sessionID).emit('auth_success', req.user);
+            res.render('auth_complete');
+        }
+    )
 });
 
 module.exports = router;

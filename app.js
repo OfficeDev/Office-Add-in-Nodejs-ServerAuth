@@ -3,81 +3,61 @@
  * See LICENSE in the project root for license information.
  */
 
-var express = require('express')
-  , app = express()
+var express = require('express');
+var app = express();
 // load up the certificates
-  , certConf = require('./certconf')
+var certConf = require('./certconf');
 // create the socket server
-  , socketServer = require('https').createServer(certConf, app)
+var socketServer = require('https').createServer(certConf, app);
 // bind it to socket.io
-  , io = require('socket.io')(socketServer);
-var dbHelper = new (require('./db/dbHelper'))(); 
+var io = require('socket.io')(socketServer);
+var dbHelper = new (require('./db/dbHelper'))();
 
 socketServer.listen(3001);
 module.exports = io;
 
-var path = require('path')
-  , favicon = require('serve-favicon')
-  , logger = require('morgan')
-  , cookieParser = require('cookie-parser')
-  , bodyParser = require('body-parser')
-  , passport = require('passport')
-  , session = require('express-session')
-  , AzureStrategy = require('passport-azure-ad-oauth2')
-  , azureConfig = require('./ws-conf').azureConf
-  , googleConfig = require('./ws-conf').googleConf
-  , routes = require('./routes/index')
-  , connect = require('./routes/connect')
-  , disconnect = require('./routes/disconnect')
-  , jwt = require('jsonwebtoken')
-  , ONE_DAY_MILLIS = 86400000
-  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var passport = require('passport');
+var session = require('express-session');
+var AzureStrategy = require('passport-azure-ad-oauth2');
+var azureConfig = require('./ws-conf').azureConf;
+var googleConfig = require('./ws-conf').googleConf;
+var routes = require('./routes/index');
+var connect = require('./routes/connect');
+var disconnect = require('./routes/disconnect');
+var jwt = require('jsonwebtoken');
+var ONE_DAY_MILLIS = 86400000;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
-// Tell passport how to use Google
-passport.use(new GoogleStrategy(
-    googleConfig,
-    function (req, accessToken, refreshToken, profile, done) {
-        dbHelper.saveAccessToken (
-            req.query.state, // This is the sessionID
-            'google',
-            profile.displayName,
-            accessToken, 
-            function (error) {
-                if (error) {
-                    done (error);
-                } else {
-                    var user = {};
-                    user.sessionID = req.query.state;
-                    user.providerName = 'google';
-                    user.displayName = profile.displayName;
-                    done(null, user);
-                }
-            }
-        );
-    })
-);
+function verifyGoogle (req, accessToken, refreshToken, profile, done) {
+    var user = {};
+    user.sessionID = req.query.state;
+    user.providerName = 'google';
+    user.displayName = profile.displayName;
+    user.accessToken = accessToken;
+    done(null, user);
+}
 
-// Tell passport how to use Azure
-passport.use('azure', new AzureStrategy(azureConfig,
-    function (req, accessToken, refreshToken, params, profile, done) {
-        var azureProfile = jwt.decode(params.id_token);
-        dbHelper.saveAccessToken (
-            req.query.state, // This is the sessionID
-            'azure',
-            azureProfile.name,
-            accessToken, 
-            function (error) {
-                if (error === null) {
-                    var user = {};
-                    user.sessionID = req.query.state;
-                    user.providerName = 'azure';
-                    user.displayName = azureProfile.name;
-                    done(null, user);
-                }
-            }
-        ); 
-    })
-);
+function verifyAzure (req, accessToken, refreshToken, params, profile, done) {
+    // Azure returns an id token with basic information about the user
+    var azureProfile = jwt.decode(params.id_token);
+
+    // Create a new user object that will be available to
+    // the /connect/:providerName/callback route
+    var user = {};
+    user.sessionID = req.query.state;
+    user.providerName = 'azure';
+    user.displayName = azureProfile.name;
+    done(null, user);
+}
+
+// Tell passport how to use Google and Azure
+passport.use(new GoogleStrategy(googleConfig, verifyGoogle));
+passport.use('azure', new AzureStrategy(azureConfig, verifyAzure));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -109,34 +89,42 @@ app.use('/connect', connect);
 app.use('/disconnect', disconnect);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+function error404Handler (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  next(err);
-});
+  next(err);    
+}
+
+app.use(error404Handler);
 
 // error handlers
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function (err, req, res, next) {
+function error500DevHandler (err, req, res) {
     res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
+    res.render('error', 
+        {
+            message: err.message,
+            error: err
+        }
+    );
+}
+
+if (app.get('env') === 'development') {
+  app.use(error500DevHandler);
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
+function error500ProdHandler (err, req, res) {
+    res.status(err.status || 500);
+    res.render('error', {
     message: err.message,
     error: {}
-  });
-});
+    });
+}
+
+app.use(error500ProdHandler);
 
 module.exports = app;
