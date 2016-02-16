@@ -10,126 +10,134 @@ var dbFile = './db/database.sqlite3';
 var providers = [
     { $providerName: 'google', $providerNameCapitalized: 'Google' },
     { $providerName: 'azure', $providerNameCapitalized: 'Azure' }
-]
+];
 
 function dbHelper() { }
 
 /**
  * Create SQLite3 table UserData
  */
-dbHelper.prototype.createDatabase = function createDatabase () {
-    var dbExists = fs.existsSync(dbFile);
-    var db = new sqlite3.Database(dbFile);
-    var createUserDataStatement = 
+dbHelper.prototype.createDatabase = function createDatabase() {
+  var dbExists = fs.existsSync(dbFile);
+  var db = new sqlite3.Database(dbFile);
+  var createUserDataStatement =
         'CREATE TABLE UserData (' +
-            'SessionID TEXT NOT NULL, ' + 
+            'SessionID TEXT NOT NULL, ' +
             'ProviderName TEXT NOT NULL, ' +
             'DisplayName TEXT  NOT NULL, ' +
-            'AccessToken TEXT NOT NULL, ' + 
+            'AccessToken TEXT NOT NULL, ' +
             'PRIMARY KEY (SessionID, ProviderName)' +
         ')';
-    var createProviderStatement = 
+  var createProviderStatement =
         'CREATE TABLE Provider (' +
-            'ProviderName TEXT NOT NULL, ' + 
+            'ProviderName TEXT NOT NULL, ' +
             'ProviderNameCapitalized TEXT NOT NULL, ' +
             'PRIMARY KEY (ProviderName)' +
         ')';
-    var insertProvidersStatement = 
+  var insertProvidersStatement =
         'INSERT INTO Provider (ProviderName, ProviderNameCapitalized) ' +
         'VALUES ($providerName, $providerNameCapitalized)';
-        
-    db.serialize(function() {
-        if(!dbExists) {
-            db.run(
+
+  db.serialize(function createTables() {
+    var insertStatement;
+
+    if (!dbExists) {
+      db.run(
                 createUserDataStatement,
                 [],
-                function (error) {
-                    if (error !== null) {
-                        console.log('Error creating UserData table: ' + error);
-                    }
+                function callback(error) {
+                  if (error !== null) {
+                    throw error;
+                  }
                 }
             );
-            db.run(
+      db.run(
                 createProviderStatement,
                 [],
-                function (error) {
-                    if (error !== null) {
-                        console.log('Error creating Provider table: ' + error);
-                    }
+                function callback(error) {
+                  if (error !== null) {
+                    throw error;
+                  }
                 }
             );
-            
-            var insertStatement = db.prepare(insertProvidersStatement);
-            for(var i = 0; i < providers.length; i++) {
-                insertStatement.run(providers[i]);
-            }
-            insertStatement.finalize();
-        }
-    });
-    db.close();
-}
 
-dbHelper.prototype.getUserData = function getUserData (sessionID, callback) {
-    var userData = {};
-    userData.sessionID = sessionID;
-    
-    var db = new sqlite3.Database(dbFile);
-    var getUserDataStatement = 
+      insertStatement = db.prepare(insertProvidersStatement);
+      for (var i = 0; i < providers.length; i++) {
+        insertStatement.run(providers[i]);
+      }
+      insertStatement.finalize();
+    }
+  });
+  db.close();
+};
+
+dbHelper.prototype.getUserData = function getUserData(sessionID, callback) {
+  var userData = {};
+  var db = new sqlite3.Database(dbFile);
+  var getUserDataStatement =
         'SELECT ' +
         '    Provider.ProviderName as providerName, ' +
         '    Provider.ProviderNameCapitalized as providerNameCapitalized, ' +
         '    UserData.SessionID as isConnected, ' +
         '    UserData.DisplayName as displayName ' +
         'FROM Provider LEFT OUTER JOIN ( ' +
-        '    SELECT SessionID, ProviderName, DisplayName FROM UserData WHERE SessionID = $sessionID) UserData ' +
+        '    SELECT SessionID, ProviderName, DisplayName ' +
+        '    FROM UserData WHERE SessionID = $sessionID) UserData ' +
         'ON Provider.ProviderName = UserData.ProviderName';
 
-    db.serialize (function() {
-        db.all (
+  userData.sessionID = sessionID;
+
+  db.serialize(function executeSelect() {
+    db.all(
             getUserDataStatement,
-            {
-                $sessionID: sessionID
-            },
-            function (error, providerDisplayNameArray) {
-                userData.providers = providerDisplayNameArray;
-                callback(error, userData);
+      {
+        $sessionID: sessionID
+      },
+            function queryExecuted(error, providerDisplayNameArray) {
+              userData.providers = providerDisplayNameArray;
+              callback(error, userData);
             }
         );
-    });
-}
+  });
+};
 
-dbHelper.prototype.saveAccessToken = function saveAccessToken (sessionID, providerName, displayName, accessToken, callback) {
-    var db = new sqlite3.Database(dbFile);
-    var insertStatement = 'INSERT INTO UserData (SessionID, ProviderName, DisplayName, AccessToken) values ($sessionID, $providerName, $displayName, $accessToken)'
+dbHelper.prototype.saveAccessToken =
+    function saveAccessToken(sessionID, providerName, displayName, accessToken, callback) {
+      var db = new sqlite3.Database(dbFile);
+      var insertStatement = 'INSERT INTO UserData ' +
+                            '(SessionID, ProviderName, DisplayName, AccessToken) ' +
+                            'VALUES ($sessionID, $providerName, $displayName, $accessToken)';
 
-    db.serialize(function() {
-        db.run (
+      db.serialize(function executeInsert() {
+        db.run(
             insertStatement,
-            {
-                $sessionID: sessionID,
-                $providerName: providerName,
-                $displayName: displayName,
-                $accessToken: accessToken
-            },
+          {
+            $sessionID: sessionID,
+            $providerName: providerName,
+            $displayName: displayName,
+            $accessToken: accessToken
+          },
             callback
         );
-    });
-}
+      });
+    };
 
-dbHelper.prototype.deleteAccessToken = function deleteAccessToken (sessionID, providerName, callback) {
-    var db = new sqlite3.Database(dbFile);
-    var deleteStatement = 'DELETE FROM UserData WHERE SessionID = $sessionID AND ProviderName = $providerName'
+dbHelper.prototype.deleteAccessToken =
+    function deleteAccessToken(sessionID, providerName, callback) {
+      var db = new sqlite3.Database(dbFile);
+      var deleteStatement = 'DELETE FROM UserData WHERE ' +
+                          'SessionID = $sessionID AND ProviderName = $providerName';
 
-    db.serialize(function() {
-        db.run (
+      db.serialize(function executeDelete() {
+        db.run(
             deleteStatement,
-            {
-                $sessionID: sessionID,
-                $providerName: providerName
-            },
+          {
+            $sessionID: sessionID,
+            $providerName: providerName
+          },
             callback
         );
-    });
-}
+      });
+    };
 
 module.exports = dbHelper;
