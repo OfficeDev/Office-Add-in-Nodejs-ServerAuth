@@ -4,8 +4,6 @@
  */
 
 exports.azureConf = {
-    authorizationURL: 'https://login.microsoftonline.com/common/oauth2/authorize',
-    tokenURL: 'https://login.microsoftonline.com/common/oauth2/token',
     clientID: 'ENTER_YOUR_CLIENT_ID',
     clientSecret: 'ENTER_YOUR_SECRET',
     resource: 'https://graph.microsoft.com',
