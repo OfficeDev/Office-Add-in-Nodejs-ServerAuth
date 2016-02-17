@@ -12,7 +12,7 @@ block content
         div(
           class='ms-ListItem-primaryText ms-Link',
           title='Connect to #{ provider.providerNameCapitalized }',
-          onclick="window.open('/connect/#{provider.providerName}/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with #{provider.providerNameCapitalized}
+          onclick="window.open('https://localhost:3000/connect/#{provider.providerName}/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')") Sign in with #{provider.providerNameCapitalized}
         span(class='ms-ListItem-secondaryText') Status: Disconnected
 
       div(id=(provider.providerName + '_connected'), style=(provider.isConnected ? 'display:block' : 'display:none') class='ms-ListItem is-selected')
@@ -20,7 +20,7 @@ block content
         span(id=(provider.providerName + '_name'), class='ms-ListItem-secondaryText') Name: #{provider.displayName}
         span(class='ms-ListItem-tertiaryText') Token available for 2 mins.
         div(class='ms-ListItem-actions')
-          a(class='ms-ListItem-action', onclick="window.open('/disconnect/#{provider.providerName}/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')")
+          a(class='ms-ListItem-action', onclick="window.open('https://localhost:3000/disconnect/#{provider.providerName}/#{sessionID}', 'AuthPopup', 'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1')")
             i(class='ms-Icon ms-Icon--x', title='Disconnect from #{provider.providerName}')
 
   p.ms-font-l When you're done, click the (x) to disconnect from the service.
