@@ -45,7 +45,7 @@ Office.initialize = function officeInitialize(reason) {
 
 function silentDisconnect(sessionID, providerName) {
   window.open(
-    '/disconnect/' + providerName + '/' + sessionID,
+    'https://localhost:3000/disconnect/' + providerName + '/' + sessionID,
     'AuthPopup',
     'width=500,height=500,centerscreen=1,menubar=0,toolbar=0,location=0,personalbar=0,status=0,titlebar=0,dialog=1'
   );
