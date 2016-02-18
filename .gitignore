@@ -2,6 +2,9 @@
 server.crt
 server.key
 
+# database files
+*.sqlite3
+
 # Logs
 logs
 *.log

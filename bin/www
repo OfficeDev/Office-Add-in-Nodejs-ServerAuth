@@ -13,19 +13,19 @@ var app = require('../app');
 var debug = require('debug')('office-add-in-nodejs-serverauth:server');
 var https = require('https');
 var certConf = require('../certconf');
+var dbHelper = new (require('../db/dbHelper'))();
+/**
+ * Create HTTP server.
+ */
+var server = https.createServer(certConf, app);
 
 /**
  * Get port from environment and store in Express.
  */
-
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
-var server = https.createServer(certConf, app);
+dbHelper.createDatabase();
 
 /**
  * Listen on provided port, on all network interfaces.

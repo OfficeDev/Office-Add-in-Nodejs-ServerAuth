@@ -3,88 +3,61 @@
  * See LICENSE in the project root for license information.
  */
 
-var express = require('express')
-  , router = express.Router()
-  , passport = require('passport')
-  , io = require('../app')
-  , cookie = require('cookie')
-  , cookieParser = require('cookie-parser')
-  , dbHelper = new (require('../db-helper'))();
+var express = require('express');
+var router = express.Router();
+var passport = require('passport');
+var io = require('../app');
+var cookie = require('cookie');
+var cookieParser = require('cookie-parser');
+var dbHelper = new(require('../db/dbHelper'))();
+var authenticationOptions = {};
 
-io.on('connection', function (socket) {
-  console.log('Socket connection est');
-  var jsonCookie =
-    cookie.parse(socket
-      .handshake
-      .headers
-      .cookie);
-  var decodedNodeCookie =
-    cookieParser
-      .signedCookie(jsonCookie.nodecookie, 'keyboard cat');
-  console.log('de-signed cookie: ' + decodedNodeCookie);
-  // the sessionId becomes the room name for this session
-  socket.join(decodedNodeCookie);
-  io.to(decodedNodeCookie).emit('init', 'Private socket session established');
+authenticationOptions.google = { session: false, scope: 'profile', accessType: 'offline' };
+authenticationOptions.azure = { session: false };
+
+io.on('connection', function onConnection(socket) {
+  var jsonCookie = cookie.parse(socket.handshake.headers.cookie);
+  var sessionID = cookieParser.signedCookie(jsonCookie.nodecookie, 'keyboard cat');
+  socket.join(sessionID);
 });
 
-router.get('/google/:sessionID', function(req, res, next) {
-  passport.authenticate('google', 
-    { 
-      scope: 'profile', 
-      accessType: 'offline', 
-      state : req.params.sessionID 
-    },
-    function(err, user) {
-      var providers = [];
-      for (var ii = 0; ii < user.providers.length; ii++) {
-        var provider = user.providers[ii];
-        providers.push({
-          providerName: provider.providerName,
-          displayName: provider.name,
-          sessionID: user.sessid
-        });
+router.get(
+  '/google/:sessionID',
+  function handleRequest(req, res, next) {
+    authenticationOptions.google.state = req.params.sessionID;
+    next();
+  },
+  passport.authenticate('google', authenticationOptions.google)
+);
+
+router.get(
+  '/azure/:sessionID',
+  function handleRequest(req, res, next) {
+    authenticationOptions.azure.state = req.params.sessionID;
+    next();
+  },
+  passport.authenticate('azure', authenticationOptions.azure)
+);
+
+router.get('/:providerName/callback', function handleRequest(req, res) {
+  dbHelper.saveAccessToken(
+    req.user.sessionID,
+    req.params.providerName,
+    req.user.displayName,
+    req.user.accessToken,
+    function callback(error) {
+      if (error) {
+        throw error;
+      } else {
+        // Intentionally strip the access token off the user object before
+        // sending it to the client.
+        // Client doesn't need it unless you want to make API calls client-side
+        req.user.accessToken = null;
+        io.to(req.user.sessionID).emit('auth_success', req.user);
+        res.render('auth_complete');
       }
-      // signal the client window (via socket) to
-      // update the user record in the db
-      io.to(user.sessid).emit('auth_success', providers);
-      next();
     }
-  )(req, res, next);
-});
-
-router.get('/google/callback', function(req, res, next) {
-  res.render('auth_complete');
-});
-
-router.get('/azure/:sessionID', function(req, res, next) {
-  passport.authenticate(
-    'azure', 
-    { state: req.params.sessionID },
-    function (err, user) {
-      var providers = [];
-      for (var ii = 0; ii < user.providers.length; ii++) {
-        var provider = user.providers[ii];
-        providers.push({
-          providerName: provider.providerName,
-          displayName: provider.name,
-          sessionID: user.sessid
-        });
-      }
-      // signal the client window (via socket) to
-      // update the user record in the db
-      io.to(user.sessid).emit('auth_success', providers);
-      next();
-    }
-  )(req, res, next);
-});
-
-router.get('/azure/callback', function(req, res, next) {
-  res.render('auth_complete');
-});
-
-router.get('/error', function (req, res) {
-  res.status(500);
-  res.send('An unexpected error was encountered.');
+  );
 });
 
 module.exports = router;

@@ -3,105 +3,61 @@
  * See LICENSE in the project root for license information.
  */
 
-var express = require('express')
-  , app = express()
+var express = require('express');
+var app = express();
 // load up the certificates
-  , certConf = require('./certconf')
+var certConf = require('./certconf');
 // create the socket server
-  , socketServer = require('https').createServer(certConf, app)
-  , dbHelper = new (require('./db-helper'))
+var socketServer = require('https').createServer(certConf, app);
 // bind it to socket.io
-  , io = require('socket.io')(socketServer);
+var io = require('socket.io')(socketServer);
 
 socketServer.listen(3001);
 module.exports = io;
 
-var path = require('path')
-  , favicon = require('serve-favicon')
-  , logger = require('morgan')
-  , cookieParser = require('cookie-parser')
-  , bodyParser = require('body-parser')
-  , passport = require('passport')
-  , session = require('express-session')
-  , AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
-  , azureConfig = require('./ws-conf').azureConf
-  , googleConfig = require('./ws-conf').googleConf
-  , routes = require('./routes/index')
-  , connect = require('./routes/connect')
-  , disconnect = require('./routes/disconnect')
-  , dbHelperInstance = new (require('./db-helper'))()
-  , jwt = require('jsonwebtoken')
-  , ONE_DAY_MILLIS = 86400000
-  , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var passport = require('passport');
+var session = require('express-session');
+var AzureStrategy = require('passport-azure-ad-oauth2');
+var azureConfig = require('./ws-conf').azureConf;
+var googleConfig = require('./ws-conf').googleConf;
+var routes = require('./routes/index');
+var connect = require('./routes/connect');
+var disconnect = require('./routes/disconnect');
+var jwt = require('jsonwebtoken');
+var ONE_DAY_MILLIS = 86400000;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
-// teach passport how to use Google
-passport.use(new GoogleStrategy(googleConfig,
-  function (req, accessToken, refreshToken, profile, done) {
-    dbHelper.getUser(req.query.state, function (err, user) {
-      console.log('Google profile: ' + JSON.stringify(profile));
-  
-      // get the user or init a new one
-      var userData = user || {};
-      if (!userData.sessid) {
-        userData.sessid = req.query.state;
-      }
-      if (!userData.providers) {
-        userData.providers = [];
-      }
-  
-      userData.providers.push({
-        accessToken: accessToken,
-        providerName: profile.provider,
-        familyName: profile.name.familyName,
-        givenName: profile.name.givenName,
-        name: profile.displayName
-      });
-  
-      dbHelperInstance.insertDoc(userData, null,
-        function (err, body) {
-          if (!err) {
-            console.log('Inserted session entry [' + userData.sessid + '] id: ' + body.id);
-          }
-          done(err, userData);
-        });
-    });
-  }));
+function verifyGoogle(req, accessToken, refreshToken, params, profile, done) {
+  var user = {};
+  user.sessionID = req.query.state;
+  user.providerName = profile.provider;
+  user.displayName = profile.displayName;
+  user.accessToken = accessToken;
+  done(null, user);
+}
 
-// teach passport how to use Azure
-passport.use('azure', new AzureAdOAuth2Strategy(azureConfig,
-  function (req, accessToken, refreshToken, params, profile, done) {
-    dbHelper.getUser(req.query.state, function (err, user) {
-      var aadProfile = jwt.decode(params.id_token);
-      console.log('User: ' + JSON.stringify(user));
-  
-      var userData = user || {};
-      if (!userData.sessid) {
-        userData.sessid = req.query.state;
-      }
-  
-      if (!userData.providers) {
-        userData.providers = [];
-      }
-  
-      userData.providers.push({
-        accessToken: accessToken,
-        providerName: 'azure',
-        familyName: aadProfile.family_name,
-        givenName: aadProfile.given_name,
-        name: aadProfile.name,
-        uniqueName: aadProfile.unique_name,
-        ver: aadProfile.ver
-      });
-  
-      dbHelperInstance.insertDoc(userData, null,
-        function (err, body) {
-          if (!err) {
-            console.log('Inserted session entry [' + userData.sessid + '] id: ' + body.id);
-          }
-          done(null, userData);
-        });
-    });
-  }));
+function verifyAzure(req, accessToken, refreshToken, params, profile, done) {
+  // Azure returns an id token with basic information about the user
+  var azureProfile = jwt.decode(params.id_token);
+
+  // Create a new user object that will be available to
+  // the /connect/:providerName/callback route
+  var user = {};
+  user.sessionID = req.query.state;
+  user.providerName = 'azure';
+  user.displayName = azureProfile.name;
+  user.accessToken = accessToken;
+  done(null, user);
+}
+
+// Tell passport how to use Google and Azure
+passport.use(new GoogleStrategy(googleConfig, verifyGoogle));
+passport.use('azure', new AzureStrategy(azureConfig, verifyAzure));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -126,50 +82,49 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(favicon(path.join(__dirname + '/public/images/favicon.ico')));
 
 app.use('/', routes);
 app.use('/connect', connect);
 app.use('/disconnect', disconnect);
 
-passport.serializeUser(function (user, done) {
-  done(null, user.sessid);
-});
-
-passport.deserializeUser(function (sessid, done) {
-  dbHelperInstance.getUser(sessid, function (err, user) {
-    done(null, user);
-  });
-});
-
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+function error404Handler(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
-});
+}
+
+app.use(error404Handler);
 
 // error handlers
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
+function error500DevHandler(err, req, res) {
+  res.status(err.status || 500);
+  res.render('error',
+    {
       message: err.message,
       error: err
-    });
-  });
+    }
+  );
+}
+
+if (app.get('env') === 'development') {
+  app.use(error500DevHandler);
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function (err, req, res, next) {
+function error500ProdHandler(err, req, res) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
     error: {}
   });
-});
+}
+
+app.use(error500ProdHandler);
 
 module.exports = app;
