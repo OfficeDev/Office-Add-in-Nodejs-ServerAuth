@@ -40,6 +40,7 @@ dbHelper.prototype.createDatabase = function createDatabase() {
 
   db.serialize(function createTables() {
     var insertStatement;
+    var i;
 
     if (!dbExists) {
       db.run(
@@ -62,7 +63,7 @@ dbHelper.prototype.createDatabase = function createDatabase() {
             );
 
       insertStatement = db.prepare(insertProvidersStatement);
-      for (var i = 0; i < providers.length; i++) {
+      for (i = 0; i < providers.length; i++) {
         insertStatement.run(providers[i]);
       }
       insertStatement.finalize();

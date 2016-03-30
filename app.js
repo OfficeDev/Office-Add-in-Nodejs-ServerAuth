@@ -7,14 +7,6 @@ var express = require('express');
 var app = express();
 // load up the certificates
 var certConf = require('./certconf');
-// create the socket server
-var socketServer = require('https').createServer(certConf, app);
-// bind it to socket.io
-var io = require('socket.io')(socketServer);
-
-socketServer.listen(3001);
-module.exports = io;
-
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -26,11 +18,18 @@ var AzureStrategy = require('passport-azure-ad-oauth2');
 var azureConfig = require('./ws-conf').azureConf;
 var googleConfig = require('./ws-conf').googleConf;
 var routes = require('./routes/index');
-var connect = require('./routes/connect');
 var disconnect = require('./routes/disconnect');
 var jwt = require('jsonwebtoken');
 var ONE_DAY_MILLIS = 86400000;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+// create the socket server
+var socketServer = require('https').createServer(certConf, app);
+// bind it to socket.io
+var io = require('socket.io')(socketServer);
+socketServer.listen(3001);
+module.exports = io;
+
+var connect = require('./routes/connect'); // eslint-disable-line vars-on-top
 
 function verifyGoogle(req, accessToken, refreshToken, params, profile, done) {
   var user = {};
