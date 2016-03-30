@@ -1,4 +1,5 @@
 # Office Add-in Server Authentication Sample for Node.js
+[![Build Status](https://travis-ci.org/OfficeDev/Office-Add-in-Nodejs-ServerAuth.svg)](https://travis-ci.org/OfficeDev/Office-Add-in-Nodejs-ServerAuth)
 
 A goal of many Microsoft Office add-ins is to improve user productivity. You can get closer to achieving this goal with the help of third-party services. Most of today's services implement the OAuth 2.0 specification to allow other applications into the user data.
 
