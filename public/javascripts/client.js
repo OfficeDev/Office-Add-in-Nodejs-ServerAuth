@@ -13,13 +13,18 @@ socket.on('auth_success', function onAuthSuccess(authenticationData) {
   // Show the 'connected' UI for the authenticated provider
   $('#' + authenticationData.providerName + '_disconnected').css('display', 'none');
   $('#' + authenticationData.providerName + '_connected').css('display', 'block');
-  $('#' + authenticationData.providerName + '_name')
-      .text('Name: ' + authenticationData.displayName);
+  $('#' + authenticationData.providerName + '_name').text('Name: ' + authenticationData.displayName);
 
   // Initiate the disconnect flow when the token lifetime comes to an end.
   timers[authenticationData.providerName] =
     setTimeout(
-      "silentDisconnect('" + authenticationData.sessionID + "', '" + authenticationData.providerName + "')",
+      function () {
+        return "silentDisconnect('" +
+          authenticationData.sessionID +
+          "', '" +
+          authenticationData.providerName +
+          "')";
+      },
       tokenLifetime
     );
 
@@ -39,8 +44,7 @@ socket.on('disconnect_complete', function onDisconnectComplete(providerName) {
 
 // The initialize function must be run each time a new page is loaded.
 Office.initialize = function officeInitialize(reason) {
-  $(document).ready(function officeReady() {
-  });
+  $(document).ready(function officeReady() {});
 };
 
 function silentDisconnect(sessionID, providerName) {
