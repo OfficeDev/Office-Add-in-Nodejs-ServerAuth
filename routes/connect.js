@@ -8,6 +8,7 @@ var router = express.Router();
 var passport = require('passport');
 var io = require('../app');
 var cookie = require('cookie');
+var csrf = require('csurf');
 var cookieParser = require('cookie-parser');
 var dbHelper = new(require('../db/dbHelper'))();
 var authenticationOptions = {};
@@ -21,6 +22,8 @@ io.on('connection', function onConnection(socket) {
   socket.join(sessionID);
 });
 
+router.use(csrf());
+
 router.get(
   '/google/:sessionID',
   function handleRequest(req, res, next) {
@@ -33,13 +36,27 @@ router.get(
 router.get(
   '/azure/:sessionID',
   function handleRequest(req, res, next) {
-    authenticationOptions.azure.state = req.params.sessionID;
+    // Include the sessionID and csrftToken value in the OAuth state parameter 
+    authenticationOptions.azure.state = req.params.sessionID + '|' + req.csrfToken();
+    res.cookie('CSRF-TOKEN', req.csrfToken());
     next();
   },
   passport.authenticate('azure', authenticationOptions.azure)
 );
 
 router.get('/:providerName/callback', function handleRequest(req, res) {
+  // At the end of the OAuth flow we need to verify that csrfToken in the cookies 
+  // matches the one returned by the OAuth flow
+  if (req.cookies['CSRF-TOKEN'] !== req.user.csrfToken) {
+    res.render('error', {
+      error : {
+        status: 403
+      }, 
+      message : 'Bad or missing CSRF value'
+    });
+    return;
+  }
+  
   dbHelper.saveAccessToken(
     req.user.sessionID,
     req.params.providerName,

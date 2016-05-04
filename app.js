@@ -43,11 +43,16 @@ function verifyGoogle(req, accessToken, refreshToken, params, profile, done) {
 function verifyAzure(req, accessToken, refreshToken, params, profile, done) {
   // Azure returns an id token with basic information about the user
   var azureProfile = jwt.decode(params.id_token);
+  var state = req.query.state;
+  var parts = state.split('|');
+  var sessionID = parts[0];
+  var csrfToken = parts[1];
 
   // Create a new user object that will be available to
   // the /connect/:providerName/callback route
   var user = {};
-  user.sessionID = req.query.state;
+  user.sessionID = sessionID;
+  user.csrfToken = csrfToken;
   user.providerName = 'azure';
   user.displayName = azureProfile.name;
   user.accessToken = accessToken;
