@@ -36,7 +36,7 @@ router.get(
 router.get(
   '/azure/:sessionID',
   function handleRequest(req, res, next) {
-    // Include the sessionID and csrftToken value in the OAuth state parameter 
+    // Include the sessionID and csrftToken value in the OAuth state parameter
     authenticationOptions.azure.state = req.params.sessionID + '|' + req.csrfToken();
     res.cookie('CSRF-TOKEN', req.csrfToken());
     next();
@@ -45,18 +45,18 @@ router.get(
 );
 
 router.get('/:providerName/callback', function handleRequest(req, res) {
-  // At the end of the OAuth flow we need to verify that csrfToken in the cookies 
+  // At the end of the OAuth flow we need to verify that csrfToken in the cookies
   // matches the one returned by the OAuth flow
   if (req.cookies['CSRF-TOKEN'] !== req.user.csrfToken) {
     res.render('error', {
-      error : {
+      error: {
         status: 403
-      }, 
-      message : 'Bad or missing CSRF value'
+      },
+      message: 'Bad or missing CSRF value'
     });
     return;
   }
-  
+
   dbHelper.saveAccessToken(
     req.user.sessionID,
     req.params.providerName,
