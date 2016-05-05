@@ -27,7 +27,9 @@ router.use(csrf());
 router.get(
   '/google/:sessionID',
   function handleRequest(req, res, next) {
-    authenticationOptions.google.state = req.params.sessionID;
+    // Include the sessionID and csrftToken value in the OAuth state parameter
+    authenticationOptions.google.state = req.params.sessionID + '|' + req.csrfToken();
+    res.cookie('CSRF-TOKEN', req.csrfToken());
     next();
   },
   passport.authenticate('google', authenticationOptions.google)

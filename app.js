@@ -33,7 +33,13 @@ var connect = require('./routes/connect'); // eslint-disable-line vars-on-top
 
 function verifyGoogle(req, accessToken, refreshToken, params, profile, done) {
   var user = {};
-  user.sessionID = req.query.state;
+  var state = req.query.state;
+  var parts = state.split('|');
+  var sessionID = parts[0];
+  var csrfToken = parts[1];
+
+  user.sessionID = sessionID;
+  user.csrfToken = csrfToken;
   user.providerName = profile.provider;
   user.displayName = profile.displayName;
   user.accessToken = accessToken;
