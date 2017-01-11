@@ -98,9 +98,6 @@ The sample requires at least one enabled API to work. We tested this sample with
     > **Note:** <br />
     You must trust the self-signed certificate so it can display properly in Office. See, [Trust your self-signed certificate](https://github.com/OfficeDev/Office-add-in-Nodejs-ServerAuth/wiki/Trust-your-self-signed-certificate) for instructions.
     
-7. Open Microsoft Word or Microsoft Excel and click **Insert** > **My add-ins** > **See all**
-8. Choose **Shared Folder** if you deployed the add-in to a network share, or **My Organization** if you deployed the add-in to the add-in catalog.
-9. Select **ServerAuth Sample**.
 
 ## Deploy the add-in
 
@@ -137,7 +134,8 @@ To open the add-in:
 1. Open Word or Excel.
 2. Choose **My Add-ins** on the **Insert** tab.
 3. Choose **Shared Folder** if you deployed the manifest to a network share or **My Organization** if you deployed the manifest to the add-in catalog.
-4. Choose **ServerAuth sample**.
+4. Choose **ServerAuth sample** and click **Add**. A new **Server Auth** group will appear on the **Home** tab of the ribbon. 
+5. Click the **Open** button in the **Server Auth** group.5. 
 
 ## Credits
 
