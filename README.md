@@ -135,7 +135,7 @@ To open the add-in:
 2. Choose **My Add-ins** on the **Insert** tab.
 3. Choose **Shared Folder** if you deployed the manifest to a network share or **My Organization** if you deployed the manifest to the add-in catalog.
 4. Choose **ServerAuth sample** and click **Add**. A new **Server Auth** group will appear on the **Home** tab of the ribbon. 
-5. Click the **Open** button in the **Server Auth** group.5. 
+5. Click the **Open** button in the **Server Auth** group. 
 
 ## Credits
 
