@@ -1,0 +1,20 @@
+### YamlMime:Sample
+sample:
+- name: Office Add-in Server Authentication Sample for Node.js
+  path: ''
+  description: Office add-ins can be used in most versions of Office, including native applications and online versions across multiple platforms. This sample shows how to incorporate 3rd party services that are compliant with the OAuth 2.0 specification by using server-side technologies.
+  readme: ''
+  generateZip: FALSE
+  isLive: TRUE
+  technologies:
+  - Office Add-in
+  azureDeploy: ''
+  author: rick-kirkham
+  platforms: []
+  languages:
+  - JavaScript
+  extensions:
+    products:
+    - Excel
+    - Word
+    scenarios: []
